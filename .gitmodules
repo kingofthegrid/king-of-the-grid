@@ -3,7 +3,7 @@
 	url = https://github.com/redcode/Zeta.git
 [submodule "external/z80"]
 	path = external/z80
-	url = git@github.com:desertkun/Z80.git
+	url = https://github.com/redcode/Z80.git
 [submodule "external/SDL"]
 	path = external/SDL
 	url = https://github.com/libsdl-org/SDL.git

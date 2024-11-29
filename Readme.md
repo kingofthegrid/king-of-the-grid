@@ -18,7 +18,17 @@ bots to compete on the most efficient algorithm to be King Of The Grid!
 
 # How to build
 
+* Install z88dk:
+  ```bash
+  git clone https://github.com/z88dk/z88dk.git
+  cd z88dk
+  git submodule update --init --recursive
+  ./build.sh -p test
+  sudo make install
+  ```
+
 * Have `cmake` and `gcc` installed.
+* `git submodule update --init --recursive`
 * Do `make`
 * To test an [example bot](./examples/test-bot) do `make test-bot`. This example
   runs the bot against itself.
@@ -100,9 +110,3 @@ defb $ED, $FE
 
 * `printf`s are supported
 * GDB support can be added if project kicks off.
-
-# Dependencies 
-
-Mac: `brew install sdl2_image sdl2_ttf sdl2`
-
-Ubuntu: `sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev`

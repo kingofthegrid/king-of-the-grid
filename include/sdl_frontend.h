@@ -1,12 +1,10 @@
 #pragma once
 
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <memory>
 
 #include "frontend.h"
-#include "sdl_text.h"
 #include "sdl_icon.h"
 
 
@@ -31,10 +29,8 @@ protected:
 private:
     SDL_Window* m_sdl_window;
     SDL_Renderer* m_sdl_renderer;
-    TTF_Font* m_sdl_font;
     int m_render_cnt;
 
-    std::unique_ptr<SDLTextLine> m_world_info;
     std::unique_ptr<SDLIconTexture> m_tx_prey;
     std::unique_ptr<SDLIconTexture> m_tx_bot1;
     std::unique_ptr<SDLIconTexture> m_tx_bot2;

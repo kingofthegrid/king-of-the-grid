@@ -240,19 +240,9 @@ int main(int argc, char** argv)
     {
         std::stringstream outcome;
 
-        // Convert map to vector of pairs
-        std::vector<std::pair<std::string, CPUProgram&>> sorted_programs(programs.begin(), programs.end());
-
-        // Sort using lambda
-        std::sort(sorted_programs.begin(), sorted_programs.end(),
-              [](const auto& a, const auto& b)
-        {
-            return a.second.get_score() > b.second.get_score();
-        });
-
         int index = 1;
 
-        for (auto p: sorted_programs)
+        for (auto p: programs)
         {
             outcome << index << ". " << p.first << " | " << p.second.get_score() << " win(s) | ";
             index++;

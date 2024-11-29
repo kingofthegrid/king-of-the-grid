@@ -3,6 +3,7 @@
 #include <array>
 #include <random>
 #include <list>
+#include <memory>
 
 #include "bot.h"
 #include "defines.h"

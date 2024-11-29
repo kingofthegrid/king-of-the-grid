@@ -1,17 +1,21 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.22)
 project(engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(SDL2)
-find_package(SDL2_ttf)
-find_package(SDL2_image)
-
 set(Z80_WITH_EXECUTE TRUE)
 set(Z80_WITH_SPECIAL_RESET TRUE)
 
+add_subdirectory(external/SDL SDL)
 add_subdirectory(external/Zeta)
-add_subdirectory(external/Z80 Z80)
+add_subdirectory(external/z80 Z80)
+add_subdirectory(external/SDL_image SDL_ttf)
+
+set(SDL_SHARED OFF) # Disable shared library
+set(SDL_STATIC ON)  # Enable static library
+set(SDL_IMAGE_PNG ON)   # Enable PNG support
+set(SDL_IMAGE_JPG OFF)  # Disable JPEG support
+set(SDL_IMAGE_TIF OFF)  # Disable TIFF support
 
 file(GLOB_RECURSE kotg_FILES "src/*.cpp")
 file(GLOB_RECURSE SDL2_FILES "sdl2/*.cpp")
@@ -29,11 +33,7 @@ target_compile_definitions(kotg_sdl2 PUBLIC -D__SDL2)
 target_include_directories(kotg_sdl2 PUBLIC
     ${SDL2_INCLUDE_DIRS})
 
-if(WIN32)
-    target_link_libraries(kotg_sdl2 PUBLIC SDL2main SDL2 SDL2_ttf)
-else()
-    target_link_libraries(kotg_sdl2 PUBLIC ${SDL2_LIBRARIES} SDL2_ttf::SDL2_ttf SDL2_image::SDL2_image)
-endif()
+target_link_libraries(kotg_sdl2 PUBLIC SDL2main SDL2 SDL2_image)
 
 set_target_properties(kotg
     PROPERTIES

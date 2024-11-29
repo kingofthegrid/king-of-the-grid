@@ -4,6 +4,7 @@
 #include "world.h"
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 static void z80_retn(void *context);
 static zuint8 z80_nmi_read(void *context, zuint16 address);

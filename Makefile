@@ -5,7 +5,12 @@ sdl2-sdl:
 	cmake -S . -B ./build/sdl2
 	cmake --build ./build/sdl2
 
-test-bot: sdl2-sdl
+test-bot:
+	mkdir -p build
+	cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -S examples/test-bot -B ./build/test-bot
+	cmake --build ./build/test-bot
+
+sdl2-test-bot: sdl2-sdl
 	mkdir -p build
 	cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -S examples/test-bot -B ./build/test-bot
 	cmake --build ./build/test-bot

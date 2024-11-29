@@ -1,5 +1,4 @@
 #include "sdl_frontend.h"
-#include "sdl_text.h"
 #include "sdl_icon.h"
 #include <iostream>
 #include <sstream>
@@ -57,7 +56,6 @@ SDLFrontend::SDLFrontend(World& world)
       m_camera_y((SCREEN_HEIGHT / 2) - (WORLD_SIZE * TILE_SIZE / 2))
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
-    TTF_Init();
 
     m_sdl_window = SDL_CreateWindow(
         "King Of The Grid",
@@ -70,12 +68,6 @@ SDLFrontend::SDLFrontend(World& world)
 
     m_sdl_renderer = SDL_CreateRenderer(m_sdl_window, -1, SDL_RENDERER_ACCELERATED);
 
-    m_sdl_font = TTF_OpenFont("font.ttf", 18);
-    if (!m_sdl_font) {
-        throw std::runtime_error("Failed to load font: " + std::string(TTF_GetError()));
-    }
-
-    m_world_info = std::make_unique<SDLTextLine>(m_sdl_renderer, m_sdl_font, SDL_Color{64, 64, 255, 255});
     m_tx_prey = std::make_unique<SDLIconTexture>(m_sdl_renderer, "prey.png");
     m_tx_bot1 = std::make_unique<SDLIconTexture>(m_sdl_renderer, "bot1.png");
     m_tx_bot2 = std::make_unique<SDLIconTexture>(m_sdl_renderer, "bot2.png");
@@ -228,14 +220,6 @@ void SDLFrontend::render_frame()
         bf->get_icon().draw(
             m_camera_x + (int)(bot->get_live_x() * TILE_SIZE),
             m_camera_y + (int)(bot->get_live_y() * TILE_SIZE), r, g, b);
-    }
-
-    {
-        std::stringstream status {};
-
-        status << "Iteration " << m_world.get_cycle() << std::endl;
-
-        m_world_info->render(8, 8, status.str());
     }
 
     SDL_RenderPresent(m_sdl_renderer);

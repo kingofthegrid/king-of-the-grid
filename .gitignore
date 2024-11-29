@@ -1,0 +1,5 @@
+examples/test-bot/.idea
+cmake-*
+bin/
+.idea/
+build/

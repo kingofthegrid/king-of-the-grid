@@ -1,0 +1,44 @@
+#pragma once
+
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
+#include <memory>
+
+#include "frontend.h"
+#include "sdl_text.h"
+#include "sdl_icon.h"
+
+
+class SDLFrontend: public Frontend
+{
+    friend class SDLBotFrontend;
+
+public:
+    explicit SDLFrontend(World& world);
+    ~SDLFrontend() override;
+
+    void* on_new_bot(Bot& bot) override;
+    void on_bot_removed(Bot& bot, void* frontend) override;
+
+    void update_cell(int x, int y, const Cell& cell) override;
+    void step() override;
+
+protected:
+    void poll_events();
+    void render_frame();
+
+private:
+    SDL_Window* m_sdl_window;
+    SDL_Renderer* m_sdl_renderer;
+    TTF_Font* m_sdl_font;
+    int m_render_cnt;
+
+    std::unique_ptr<SDLTextLine> m_world_info;
+    std::unique_ptr<SDLIconTexture> m_tx_prey;
+    std::unique_ptr<SDLIconTexture> m_tx_bot1;
+    std::unique_ptr<SDLIconTexture> m_tx_bot2;
+
+    int m_camera_x;
+    int m_camera_y;
+};

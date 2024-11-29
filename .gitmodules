@@ -1,0 +1,6 @@
+[submodule "external/Zeta"]
+	path = external/Zeta
+	url = https://github.com/redcode/Zeta.git
+[submodule "external/z80"]
+	path = external/z80
+	url = git@github.com:desertkun/Z80.git

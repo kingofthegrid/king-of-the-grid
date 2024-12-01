@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(engine)
+project(engine C CXX OBJC)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -18,27 +18,29 @@ set(SDL_IMAGE_JPG OFF)  # Disable JPEG support
 set(SDL_IMAGE_TIF OFF)  # Disable TIFF support
 
 file(GLOB_RECURSE kotg_FILES "src/*.cpp")
-file(GLOB_RECURSE SDL2_FILES "sdl2/*.cpp")
+file(GLOB_RECURSE SDL2_FILES "sdl/*.cpp")
 
 add_executable(kotg ${kotg_FILES})
-add_executable(kotg_sdl2 ${kotg_FILES} ${SDL2_FILES})
+add_executable(kotg_sdl ${kotg_FILES} ${SDL2_FILES})
 
 target_link_libraries(kotg PUBLIC Z80)
-target_link_libraries(kotg_sdl2 PUBLIC Z80)
+target_link_libraries(kotg_sdl PUBLIC Z80)
 
 target_include_directories(kotg PUBLIC "include")
-target_include_directories(kotg_sdl2 PUBLIC "include")
-target_compile_definitions(kotg_sdl2 PUBLIC -D__SDL2)
+target_include_directories(kotg_sdl PUBLIC "include")
+target_include_directories(kotg_sdl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL/include")
+target_include_directories(kotg_sdl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL_image/include")
+target_compile_definitions(kotg_sdl PUBLIC -D__SDL)
 
-target_include_directories(kotg_sdl2 PUBLIC
+target_include_directories(kotg_sdl PUBLIC
     ${SDL2_INCLUDE_DIRS})
 
-target_link_libraries(kotg_sdl2 PUBLIC SDL2main SDL2 SDL2_image)
+target_link_libraries(kotg_sdl PRIVATE SDL3::SDL3 SDL3_image::SDL3_image)
 
 set_target_properties(kotg
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
-set_target_properties(kotg_sdl2
+set_target_properties(kotg_sdl
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")

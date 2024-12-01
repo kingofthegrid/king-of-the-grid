@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include "world.h"
-#ifdef __SDL2
+#ifdef __SDL
 #include "sdl_frontend.h"
 #endif
 #include "server_frontend.h"
@@ -43,7 +43,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
 
     std::unique_ptr<Frontend> frontend;
 
-#ifdef __SDL2
+#ifdef __SDL
     frontend = std::make_unique<SDLFrontend>(*world);
 #else
     frontend = std::make_unique<ServerFrontend>(*world);
@@ -91,15 +91,38 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
 
 int main(int argc, char** argv)
 {
-#ifdef __SDL2
-    if (argc < 4)
+#ifdef __SDL
+    if (argc < 2)
     {
-        throw std::runtime_error("Usage: kotg_sdl2 <program1> <program2> <seed>");
+        throw std::runtime_error("Usage: kotg_sdl2 <program1> [<program2>] [<seed>]");
     }
 
     std::string program1_name = argv[1];
-    std::string program2_name = argv[2];
-    int seed = std::atoi(argv[3]);
+
+    std::string program2_name;
+    if (argc > 2)
+    {
+        program2_name = argv[2];
+    }
+    else
+    {
+        std::cout << "Only one program specified: using against itself." << std::endl;
+        program2_name = program1_name;
+    }
+
+    int seed;
+
+    if (argc > 3)
+    {
+        seed = std::atoi(argv[3]);
+    }
+    else
+    {
+        srand(time(0));
+        seed = rand();
+
+        std::cout << "Seed not provided. Using random: " << seed << std::endl;
+    }
 
     CPUProgram first_program(program1_name, program1_name + ".bin", true);
     CPUProgram second_program(program2_name, program2_name + ".bin", false);
@@ -122,7 +145,7 @@ int main(int argc, char** argv)
     }
 #endif
 
-#ifdef __SDL2
+#ifdef __SDL
 
     int result = test_programs(seed, first_program, second_program);
 

@@ -55,18 +55,29 @@ SDLFrontend::SDLFrontend(World& world)
       m_camera_x((SCREEN_WIDTH / 2) - (WORLD_SIZE * TILE_SIZE / 2)),
       m_camera_y((SCREEN_HEIGHT / 2) - (WORLD_SIZE * TILE_SIZE / 2))
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
+    {
+        throw std::runtime_error(std::string("Failed to init SDL: ") + SDL_GetError());
+    }
 
     m_sdl_window = SDL_CreateWindow(
         "King Of The Grid",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
         SCREEN_WIDTH,
         SCREEN_HEIGHT,
-        SDL_WINDOW_SHOWN
+        SDL_WINDOW_OPENGL
     );
 
-    m_sdl_renderer = SDL_CreateRenderer(m_sdl_window, -1, SDL_RENDERER_ACCELERATED);
+    if (!m_sdl_window)
+    {
+        throw std::runtime_error(std::string("Failed to create window: ") + SDL_GetError());
+    }
+
+    m_sdl_renderer = SDL_CreateRenderer(m_sdl_window, nullptr);
+
+    if (!m_sdl_renderer)
+    {
+        throw std::runtime_error(std::string("Failed to create renderer: ") + SDL_GetError());
+    }
 
     m_tx_prey = std::make_unique<SDLIconTexture>(m_sdl_renderer, "prey.png");
     m_tx_bot1 = std::make_unique<SDLIconTexture>(m_sdl_renderer, "bot1.png");
@@ -105,30 +116,30 @@ void SDLFrontend::poll_events()
 
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_QUIT)
+        if (e.type == SDL_EVENT_QUIT)
         {
             m_world.stop();
         }
-        if (e.type == SDL_KEYDOWN)
+        if (e.type == SDL_EVENT_KEY_DOWN)
         {
-            switch (e.key.keysym.sym)
+            switch (e.key.key)
             {
-                case SDLK_d:
+                case SDLK_D:
                 {
                     m_camera_x -= TILE_MOVE;
                     break;
                 }
-                case SDLK_a:
+                case SDLK_A:
                 {
                     m_camera_x += TILE_MOVE;
                     break;
                 }
-                case SDLK_s:
+                case SDLK_S:
                 {
                     m_camera_y -= TILE_MOVE;
                     break;
                 }
-                case SDLK_w:
+                case SDLK_W:
                 {
                     m_camera_y += TILE_MOVE;
                     break;
@@ -156,24 +167,24 @@ void SDLFrontend::render_frame()
     {
         SDL_SetRenderDrawColor(m_sdl_renderer, 255, 0, 0, 255);
 
-        SDL_Rect rect;
+        SDL_FRect rect;
 
         rect.x = m_camera_x - 8;
         rect.y = m_camera_y - 8;
         rect.w = WORLD_SIZE * TILE_SIZE + 16;
         rect.h = WORLD_SIZE * TILE_SIZE + 16;
 
-        SDL_RenderDrawRect(m_sdl_renderer, &rect);
+        SDL_RenderRect(m_sdl_renderer, &rect);
     }
 
     for (int y_c = 0; y_c < WORLD_SIZE; y_c++)
     {
         for (int x_c = 0; x_c < WORLD_SIZE; x_c++)
         {
-            SDL_Rect rect;
+            SDL_FRect rect;
 
-            rect.x = m_camera_x + x_c * TILE_SIZE;
-            rect.y = m_camera_y + y_c * TILE_SIZE;
+            rect.x = m_camera_x + (float)x_c * TILE_SIZE;
+            rect.y = m_camera_y + (float)y_c * TILE_SIZE;
             rect.w = TILE_SIZE;
             rect.h = TILE_SIZE;
 
@@ -218,8 +229,8 @@ void SDLFrontend::render_frame()
         }
 
         bf->get_icon().draw(
-            m_camera_x + (int)(bot->get_live_x() * TILE_SIZE),
-            m_camera_y + (int)(bot->get_live_y() * TILE_SIZE), r, g, b);
+            m_camera_x + (float)(bot->get_live_x() * TILE_SIZE),
+            m_camera_y + (float)(bot->get_live_y() * TILE_SIZE), r, g, b);
     }
 
     SDL_RenderPresent(m_sdl_renderer);

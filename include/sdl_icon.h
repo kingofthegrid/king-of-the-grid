@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_image.h"
+#include "SDL3/SDL.h"
+#include "SDL3_image/SDL_image.h"
 
 #include <iostream>
 
@@ -23,10 +23,19 @@ struct SDLIconTexture
             texture = nullptr;
         }
 
+        const char* base_path = SDL_GetBasePath();
+
+        if (!base_path) {
+            std::cerr << "SDL_GetBasePath failed: " << SDL_GetError() << std::endl;
+            return false;
+        }
+
         // Load image
-        SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+        std::string p = std::string(base_path) + "/" + path.c_str();
+
+        SDL_Surface* loadedSurface = IMG_Load(p.c_str());
         if (!loadedSurface) {
-            std::cerr << "Unable to load image " << path << "! SDL_image Error: " << IMG_GetError() << std::endl;
+            std::cerr << "Unable to load image " << path << "! SDL_image Error: " << SDL_GetError() << std::endl;
             return false;
         }
 
@@ -34,7 +43,7 @@ struct SDLIconTexture
         texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
         if (!texture) {
             std::cerr << "Unable to create texture from " << path << "! SDL Error: " << SDL_GetError() << std::endl;
-            SDL_FreeSurface(loadedSurface);
+            SDL_DestroySurface(loadedSurface);
             return false;
         }
 
@@ -42,7 +51,7 @@ struct SDLIconTexture
         width = loadedSurface->w;
         height = loadedSurface->h;
 
-        SDL_FreeSurface(loadedSurface);
+        SDL_DestroySurface(loadedSurface);
         return true;
     }
 
@@ -64,25 +73,25 @@ class SDLIcon
 {
 public:
     // Constructor
-    SDLIcon(SDL_Renderer* renderer, SDLIconTexture& texture, int width, int height) :
+    SDLIcon(SDL_Renderer* renderer, SDLIconTexture& texture, float width, float height) :
         renderer(renderer), texture(texture),
         width(width), height(height)
     {
     }
 
-    void draw(int x, int y, int r, int g, int b) const
+    void draw(float x, float y, int r, int g, int b) const
     {
         if (texture.texture)
         {
-            SDL_Rect renderQuad = {x, y, width, height};
+            SDL_FRect renderQuad = {x, y, width, height};
             SDL_SetTextureColorMod(texture.texture, r, g, b);
-            SDL_RenderCopy(renderer, texture.texture, nullptr, &renderQuad);
+            SDL_RenderTexture(renderer, texture.texture, nullptr, &renderQuad);
         }
     }
 
 private:
     SDL_Renderer* renderer;
     SDLIconTexture& texture;
-    int width;
-    int height;
+    float width;
+    float height;
 };

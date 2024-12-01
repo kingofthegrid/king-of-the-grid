@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <memory>
 
 #include "frontend.h"
@@ -35,6 +35,6 @@ private:
     std::unique_ptr<SDLIconTexture> m_tx_bot1;
     std::unique_ptr<SDLIconTexture> m_tx_bot2;
 
-    int m_camera_x;
-    int m_camera_y;
+    float m_camera_x;
+    float m_camera_y;
 };

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (APPLE)
     project(engine C CXX OBJC)
 else()
     project(engine C CXX)

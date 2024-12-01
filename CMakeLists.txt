@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
-project(engine C CXX OBJC)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    project(engine C CXX OBJC)
+else()
+    project(engine C CXX)
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 

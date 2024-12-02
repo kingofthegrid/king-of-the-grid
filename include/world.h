@@ -69,6 +69,7 @@ public:
 
     void add_bot(Frontend& frontend, Bot* bot);
     void enable_recording(const std::string& name, const std::string& title);
+    void start();
 
     std::unique_ptr<Recording>& get_recording() { return m_recording; }
 

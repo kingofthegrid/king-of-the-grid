@@ -3,7 +3,7 @@
 *A Z80 Sandbox Competition Game* in which developers can write
 bots to compete on the most efficient algorithm to be King Of The Grid!
 
-![img.png](doc/img.png)
+![game.gif](doc/game.gif)
 
 # Game Rules
 
@@ -30,16 +30,16 @@ bots to compete on the most efficient algorithm to be King Of The Grid!
 * Have `cmake` and `gcc` installed.
 * `git submodule update --init --recursive`
 * Do `make`
-* To test an [example bot](./examples/test-bot) do `make test-bot`. This example
+* To test an [example bot](./examples/test-bot) do `make testbot`. This example
   runs the bot against itself.
 
 # How to run
 
-## SDL single session:
+## Single session:
 
-Go into folder with two (or one) of your programs, they must have `.bin` extantion.
+Go into folder with two (or one) of your programs, they must have `.bin` extension.
 
-Run: `kotg_sdl2 <program1> <program2> <seed>`.
+Run: `kotg <program1> [<program2>] [<seed>]`.
 
 ## Mass session:
 
@@ -50,11 +50,22 @@ Run `kotg`
 In this mode, each pair of programs will play against one another twice on the same seed.
 That way both bots have a chance.
 
+Any game session can be replicated. Given a session outcome AAA BBB 1338, you can just pass these arguments to kotg
+and play the game again.
+
 ## What is `seed`
 
 Every game is deterministic: given two programs and a seed, it will play out exactly the same.
 That way, when you loose in a mass session, you can replicate the session with your target in order to 
 adjust to your opponent's behavior.
+
+# Watching the results
+
+Game outputs files `<a>-<b>-<seed>.txt` which you can play using [asciinema.org](https://asciinema.org/):
+
+```bash
+asciinema play <a>-<b>-<seed>.txt
+```
 
 # CPUs
 

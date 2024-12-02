@@ -131,3 +131,11 @@ void World::enable_recording(const std::string& name, const std::string& title)
 {
     m_recording = std::make_unique<Recording>(*this, name, title);
 }
+
+void World::start()
+{
+    if (m_recording)
+    {
+        m_recording->start();
+    }
+}

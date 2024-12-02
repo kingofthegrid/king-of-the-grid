@@ -17,6 +17,20 @@ static zuint8 z80_memory_fetch(void *context, zuint16 address);
 static zuint8 z80_memory_fetch_opcode(void *context, zuint16 address);
 static zuint8 z80_memory_read(void *context, zuint16 address);
 
+void replace_all(std::string &str, const std::string &from, const std::string &to)
+{
+    if (from.empty()) {
+        return; // Avoid infinite loop if 'from' is an empty string
+    }
+
+    size_t pos = 0;
+
+    while ((pos = str.find(from, pos)) != std::string::npos) {
+        str.replace(pos, from.length(), to);
+        pos += to.length(); // Advance position past the inserted substring
+    }
+}
+
 static zuint8 z80_memory_read(void *context, zuint16 address)
 {
     auto* computer = (CPUBot*)context;
@@ -282,10 +296,16 @@ CPUBot::~CPUBot()
     m_program.remove_count();
 
     {
-        const auto& out = m_stdout.str();
+        auto out = m_stdout.str();
         if (!out.empty())
         {
             std::cout << get_name() << " | " << out;
+
+            if (m_world.get_recording())
+            {
+                replace_all(out, "\n", "\\n");
+                m_world.get_recording()->add_stdout(m_program.is_first() ? 0 : 1, out);
+            }
         }
     }
     {
@@ -411,10 +431,14 @@ void CPUBot::on_stdout(char c)
 {
     if ( c == '\n' || c == '\r' )
     {
-        m_stdout << std::endl;
         m_stdout_total << std::endl;
-        std::cout << get_name() << " | " << m_stdout.str();
-        m_stdout.clear();
+        std::cout << get_name() << " | " << m_stdout.str() << std::endl;
+        std::string o = m_stdout.str();
+        replace_all(o, "\n", "\\n");
+        replace_all(o, "\r", "");
+        m_world.get_recording()->add_stdout(m_program.is_first() ? 0 : 1, o);
+
+        m_stdout.str("");
     }
     else
     {

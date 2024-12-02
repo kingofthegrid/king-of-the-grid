@@ -19,16 +19,7 @@ bots to compete on the most efficient algorithm to be King Of The Grid!
 * Bot that survives the longest, wins.
 * If both bots survive for too long, it's a draw.
 
-# How to build
-
-* Install z88dk:
-  ```bash
-  git clone https://github.com/z88dk/z88dk.git
-  cd z88dk
-  git submodule update --init --recursive
-  ./build.sh -p test
-  sudo make install
-  ```
+# How to build the game
 
 * Have `cmake` and `gcc` installed.
 * `git submodule update --init --recursive`
@@ -96,6 +87,15 @@ asciinema play <a>-<b>-<seed>.txt
 </table>
 
 # How to write your Bot
+
+* [Download z88dk](https://github.com/z88dk/z88dk/releases) or install z88dk from sources:
+  ```bash
+  git clone https://github.com/z88dk/z88dk.git
+  cd z88dk
+  git submodule update --init --recursive
+  ./build.sh -p test
+  sudo make install
+  ```
 
 * See [example bot](./examples/test-bot) for an example on how to build with C and z88dk
 * If you prefer assembly, see section below.

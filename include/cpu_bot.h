@@ -59,6 +59,9 @@ public:
     Z80* get_cpu() { return &m_cpu; }
     const CPUProgram& get_program() const { return m_program; }
 
+    bool is_prey() const override { return false; }
+    int get_bot_type() const override;
+
 private:
     CPUProgram& m_program;
     Z80 m_cpu;

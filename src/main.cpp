@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include "world.h"
+#include "recording.h"
 #ifdef __SDL
 #include "sdl_frontend.h"
 #endif
@@ -41,6 +42,9 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
     long limit = 0;
     std::unique_ptr<World> world = std::make_unique<World>(seed);
 
+    world->enable_recording("recording.txt", "King-Of-The-Grid | " + program1.get_name() + " vs " +
+        program2.get_name() + " seed " + std::to_string(seed));
+
     std::unique_ptr<Frontend> frontend;
 
 #ifdef __SDL
@@ -54,20 +58,37 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
 
     std::cout << "Created world with seed " << world->get_seed() << std::endl;
 
+    if (world->get_recording())
+    {
+        world->get_recording()->event("Playing: " + program1.get_name() + " vs " + program2.get_name());
+    }
+
     while (world->is_running())
     {
         world->simulate(*frontend);
         frontend->step();
         if (program1.lost() and program2.lost())
         {
+            if (world->get_recording())
+            {
+                world->get_recording()->event("Game ended with Draw.");
+            }
             break;
         }
         else if (program1.lost())
         {
+            if (world->get_recording())
+            {
+                world->get_recording()->event("Program " + program2.get_name() + " (2) won.");
+            }
             result = 2;
             break;
         } else if (program2.lost())
         {
+            if (world->get_recording())
+            {
+                world->get_recording()->event("Program " + program1.get_name() + " (1) won.");
+            }
             result = 1;
             break;
         }
@@ -76,6 +97,10 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
         if (limit > ITERATION_LIMIT)
         {
             std::cout << "Reached limit of " << ITERATION_LIMIT << " iterations. " << std::endl;
+            if (world->get_recording())
+            {
+                world->get_recording()->event(std::string("Reached limit of ") + std::to_string(ITERATION_LIMIT) + " iterations.");
+            }
             result = 0;
             break;
         }

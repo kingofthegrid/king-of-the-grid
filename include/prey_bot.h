@@ -12,6 +12,7 @@ public:
     ~PreyBot() override;
 
     void simulate() override;
+    int get_bot_type() const override;
 private:
     int m_cooldown;
 };

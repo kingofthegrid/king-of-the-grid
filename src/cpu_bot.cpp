@@ -2,6 +2,7 @@
 #include "Z80.h"
 #include "bot_api.h"
 #include "world.h"
+#include "recording.h"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -420,4 +421,9 @@ void CPUBot::on_stdout(char c)
         m_stdout << c;
         m_stdout_total << c;
     }
+}
+
+int CPUBot::get_bot_type() const
+{
+    return m_program.is_first() ? Recording::CELL_BOT_A : Recording::CELL_BOT_B;
 }

@@ -1,5 +1,6 @@
 #include "prey_bot.h"
 #include "world.h"
+#include "recording.h"
 
 int PreyBot::PREY_COUNT = 0;
 
@@ -12,6 +13,11 @@ PreyBot::PreyBot(Frontend& frontend, World& world, int x, int y, int energy)
 PreyBot::~PreyBot()
 {
     PREY_COUNT--;
+}
+
+int PreyBot::get_bot_type() const
+{
+    return Recording::CELL_PREY;
 }
 
 void PreyBot::simulate()

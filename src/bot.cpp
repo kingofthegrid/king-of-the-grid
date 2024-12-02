@@ -1,8 +1,10 @@
 #include "bot.h"
 #include "world.h"
 #include "frontend.h"
+#include "recording.h"
 
 #include <iostream>
+#include <sstream>
 
 int Bot::LAST_BOT_ID = 1;
 
@@ -24,6 +26,10 @@ Bot::~Bot()
     {
         auto& cell = m_world.get_cell(m_x, m_y);
         cell.set_empty();
+        if (m_world.get_recording())
+        {
+            m_world.get_recording()->cell_removed(m_x, m_y);
+        }
     }
 
     std::cout << "Bot removed: " << get_name() << std::endl;
@@ -173,10 +179,26 @@ void Bot::move(int x, int y)
 
     old_cell.set_empty();
 
+    if (m_world.get_recording())
+    {
+        m_world.get_recording()->cell_removed(m_x, m_y);
+    }
+
     if (new_cell.is_food())
     {
         int food = new_cell.m_food_value * FOOD_ENERGY_MULTIPLIER;
         std::cout << "Bot " << get_name() << " ate " << food << " of food " << std::endl;
+
+        if (!is_prey())
+        {
+            if (m_world.get_recording())
+            {
+                std::stringstream ss;
+                ss << "Bot " << get_name() << " ate " << food << " of food";
+                m_world.get_recording()->event(ss.str());
+            }
+        }
+
         m_energy += food;
 
         if (m_energy > BOT_MAX_ENERGY)
@@ -188,6 +210,17 @@ void Bot::move(int x, int y)
     if (eating)
     {
         std::cout << "Bot " << get_name() << " ate bot " << eating->get_name() << std::endl;
+
+        if (!is_prey())
+        {
+            if (m_world.get_recording())
+            {
+                std::stringstream ss;
+                ss << "Bot " << get_name() << " ate bot " << eating->get_name();
+                m_world.get_recording()->event(ss.str());
+            }
+        }
+
         eating->kill();
         eating->m_clear_cell = false;
         m_energy += eating->m_energy;
@@ -196,6 +229,11 @@ void Bot::move(int x, int y)
     m_x = new_x;
     m_y = new_y;
     new_cell.set_bot(this);
+
+    if (m_world.get_recording())
+    {
+        m_world.get_recording()->new_cell(new_x, new_y, get_bot_type());
+    }
 
     m_energy -= BOT_MOVE_ENERGY;
     m_move_timer = 0;

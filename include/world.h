@@ -8,6 +8,8 @@
 #include "bot.h"
 #include "defines.h"
 
+class Recording;
+
 enum class CellState
 {
     empty,
@@ -66,6 +68,9 @@ public:
     int get_random(int min, int max);
 
     void add_bot(Frontend& frontend, Bot* bot);
+    void enable_recording(const std::string& name, const std::string& title);
+
+    std::unique_ptr<Recording>& get_recording() { return m_recording; }
 
 private:
     std::array<Cell,  WORLD_SIZE_SQ> m_cells;
@@ -75,4 +80,5 @@ private:
     int m_cycle;
     int m_seed;
     std::mt19937 m_random_engine;
+    std::unique_ptr<Recording> m_recording;
 };

@@ -1,8 +1,10 @@
 #include "world.h"
 #include "prey_bot.h"
 #include "frontend.h"
+#include "recording.h"
 
 #include <iostream>
+#include <memory>
 
 World::World(int seed) :
     m_cells({}),
@@ -32,6 +34,10 @@ void World::simulate(Frontend& frontend)
         if (cell.is_empty())
         {
             cell.set_food(get_random(0, FOOD_SPAWN_ENERGY));
+            if (m_recording)
+            {
+                m_recording->new_cell(x, y, Recording::CELL_FOOD);
+            }
         }
     }
 
@@ -64,6 +70,7 @@ void World::simulate(Frontend& frontend)
                     if (cell.m_food_value == 0)
                     {
                         cell.set_empty();
+                        m_recording->cell_removed(x_c, y_c);
                     }
                 }
             }
@@ -78,6 +85,11 @@ void World::simulate(Frontend& frontend)
     m_bots.remove_if([&](const std::unique_ptr<Bot>& bot) -> bool {
         return !bot->is_alive();
     });
+
+    if (m_recording)
+    {
+        m_recording->iteration();
+    }
 }
 
 Cell& World::get_cell(int x, int y)
@@ -107,5 +119,15 @@ void World::add_bot(Frontend& frontend, Bot* bot)
     auto& cell = get_cell(bot->get_x(), bot->get_y());
     cell.set_bot(bot);
 
+    if (m_recording)
+    {
+        m_recording->new_cell(bot->get_x(), bot->get_y(), bot->get_bot_type());
+    }
+
     std::cout << "New bot added: " << bot->get_name() << std::endl;
+}
+
+void World::enable_recording(const std::string& name, const std::string& title)
+{
+    m_recording = std::make_unique<Recording>(*this, name, title);
 }

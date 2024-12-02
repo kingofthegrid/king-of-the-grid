@@ -57,6 +57,9 @@ public:
     void move_up();
     void move_down();
 
+    virtual bool is_prey() const { return true; }
+    virtual int get_bot_type() const = 0;
+
 protected:
     Frontend& m_frontend;
     World& m_world;

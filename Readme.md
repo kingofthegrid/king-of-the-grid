@@ -3,7 +3,10 @@
 *A Z80 Sandbox Competition Game* in which developers can write
 bots to compete on the most efficient algorithm to be King Of The Grid!
 
-![game.gif](doc/game.gif)
+<div align="center">
+  <img src="doc/game.gif" width="500"/><br/>
+  Example of a single competition.
+</div>
 
 # Game Rules
 
@@ -85,14 +88,23 @@ asciinema play <a>-<b>-<seed>.txt
 </tr>
 <tr>
 <td>0x0000 - 0x1FFF</td>
-<td>Shar
+<td>Shared memory across all friendly bots
 <tr>
 <td>0x2000 - 0xFFFF</td>
 <td>Program memory</td>
 </tr>
 </table>
 
+# How to write your Bot
+
+* See [example bot](./examples/test-bot) for an example on how to build with C and z88dk
+* If you prefer assembly, see section below.
+
 # I don't like z88dk or C for that matter
+
+* Make sure your code has base address (`.ORG`) of 8192.
+* For communication, see below.
+* Other than that, your bot can do whatever!
 
 See [bot_api.c](bot-api/bot_api.c) on how bot interacts with the world.
 

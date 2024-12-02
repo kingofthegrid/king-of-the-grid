@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <sstream>
-
+#include <iomanip>
 
 Recording::Recording(World& world, const std::string& name, const std::string& title) :
     m_title(title),

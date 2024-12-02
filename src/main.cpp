@@ -21,7 +21,7 @@ std::vector<std::string> find_bin_files(const std::string& folder_path)
         {
             if (entry.is_regular_file() && entry.path().extension() == ".bin")
             {
-                result.push_back(entry.path().stem());
+                result.push_back(entry.path().stem().string());
             }
         }
     }

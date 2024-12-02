@@ -35,6 +35,13 @@ Go into folder with two (or one) of your programs, they must have `.bin` extensi
 
 Run: `kotg <program1> [<program2>] [<seed>]`.
 
+Game outputs files `recording-xxx.txt`, which you can play with [asciinema](https://asciinema.org/):
+```bash
+asciinema play recording-xxx.txt
+# or, to share the game on the web
+asciinema upload recording-xxx.txt
+```
+
 ## Mass session:
 
 Have all your programs (2+) placed into current folder.

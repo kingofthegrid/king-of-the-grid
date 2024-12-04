@@ -39,7 +39,8 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
     long limit = 0;
     std::unique_ptr<World> world = std::make_unique<World>(seed);
 
-    world->enable_recording(program1.get_name() + "-" + program2.get_name() + "-" + std::to_string(seed) + ".txt",
+    world->enable_recording("recording-" + program1.get_name() + "-" +
+        program2.get_name() + "-" + std::to_string(seed) + ".txt",
         "King-Of-The-Grid | " + program1.get_name() + " vs " +
         program2.get_name() + " seed " + std::to_string(seed));
 
@@ -106,8 +107,39 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
 
     std::cout << "Stopped world " << std::endl;
 
+    std::string recording_name = world->get_recording()->get_name();
+
     world.reset();
     frontend.reset();
+
+    std::cout << std::endl << "============================================================" << std::endl;
+
+    std::cout << "OUTCOME: " << std::endl;
+
+    switch (result)
+    {
+        case 1:
+        {
+            std::cout << "    Program " << program1.get_name() << " (1) won." << std::endl;
+            break;
+        }
+        case 2:
+        {
+            std::cout << "    Program " << program2.get_name() << " (2) won." << std::endl;
+            break;
+        }
+        case 0:
+        default:
+        {
+            std::cout << "    Draw." << std::endl;
+            break;
+        }
+    }
+
+    std::cout << "GAME (asciinema play) RECORDING: " << std::endl;
+    std::cout << "    " << recording_name << std::endl;
+
+    std::cout << "============================================================" << std::endl;
 
     return result;
 }
@@ -292,27 +324,6 @@ int main(int argc, char** argv)
         CPUProgram second_program(program2_name, program2_name + ".bin", false);
 
         int result = test_programs(seed, first_program, second_program);
-
-        switch (result)
-        {
-            case 1:
-            {
-                std::cout << "Program " << first_program.get_name() << " (1) won." << std::endl;
-                break;
-            }
-            case 2:
-            {
-                std::cout << "Program " << second_program.get_name() << " (2) won." << std::endl;
-                break;
-            }
-            case 0:
-            default:
-            {
-                std::cout << "Draw." << std::endl;
-                break;
-            }
-        }
-
         return result;
     }
 }

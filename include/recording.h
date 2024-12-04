@@ -47,10 +47,13 @@ public:
     void add_stdout(int index, const std::string& v);
     RecordingSTDOut& get_stdout(int index) { return m_stdouts[index]; }
 
+    const std::string& get_name() const { return m_name; }
+
 private:
     float timestamp();
 
 private:
+    std::string m_name;
     std::string m_title;
     World& m_world;
     std::ofstream m_stream;

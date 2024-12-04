@@ -7,6 +7,7 @@
 #include <iomanip>
 
 Recording::Recording(World& world, const std::string& name, const std::string& title) :
+    m_name(name),
     m_title(title),
     m_world(world),
     m_stream(name, std::ios_base::out),

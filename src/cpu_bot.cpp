@@ -3,6 +3,7 @@
 #include "bot_api.h"
 #include "world.h"
 #include "recording.h"
+#include "rules.h"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -143,7 +144,7 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                     struct scan_t scan = {};
                     uint16_t mem = Z80_HL(*cpu);
                     computer->scan(&scan);
-                    memcpy(computer->get_private_memory() + mem, scan.scan_result, sizeof(scan.scan_result));
+                    memcpy(computer->get_private_memory() + mem, scan.scan_result.data(), scan.scan_result.size());
                     z80_break(cpu);
                     break;
                 }
@@ -334,31 +335,33 @@ void CPUBot::simulate()
 
     if (get_state() == BotState::normal)
     {
-        z80_run(&m_cpu, CPU_CYCLES_PER_ITERATION);
+        z80_run(&m_cpu, WorldRules::bot_z80_ticks_per_tick);
     }
 }
 
 void CPUBot::hibernate()
 {
-    m_move_timer = HIBERNATE_TIME;
+    m_move_timer = WorldRules::time_on_hibernate;
     set_state(BotState::hibernating);
 }
 
 void CPUBot::scan(struct scan_t* scan)
 {
-    m_energy -= SCAN_ENERGY;
-    m_move_timer = SCAN_TIME;
+    m_energy -= WorldRules::energy_to_scan;
+    m_move_timer = WorldRules::time_to_scan;
     set_state(BotState::scanning);
 
-    memset(scan->scan_result, 0, sizeof(scan->scan_result));
+    int sz = WorldRules::bot_scan_half_size * 2 + 1;
+    scan->scan_result.resize(sz * sz);
+    memset(scan->scan_result.data(), 0, scan->scan_result.size());
 
     int xx = get_x();
     int yy = get_y();
-    char *c = scan->scan_result;
+    char *c = scan->scan_result.data();
 
-    for (int y = -SCAN_SIZE_HALF; y <= SCAN_SIZE_HALF; y++)
+    for (int y = -WorldRules::bot_scan_half_size; y <= WorldRules::bot_scan_half_size; y++)
     {
-        for (int x = -SCAN_SIZE_HALF; x <= SCAN_SIZE_HALF; x++, c++)
+        for (int x = -WorldRules::bot_scan_half_size; x <= WorldRules::bot_scan_half_size; x++, c++)
         {
             int x1 = xx + x;
             int y1 = yy + y;
@@ -366,7 +369,7 @@ void CPUBot::scan(struct scan_t* scan)
             if (x1 < 0 || y1 < 0)
                 continue;
 
-            if (x1 >= WORLD_SIZE || y1 >= WORLD_SIZE)
+            if (x1 >= WorldRules::world_width || y1 >= WorldRules::world_height)
                 continue;
 
             auto& cell = m_world.get_cell(x1, y1);
@@ -413,7 +416,7 @@ int CPUBot::split(int x, int y, int energy)
         if (new_x < 0 || new_y < 0)
             return 0;
 
-        if (new_x >= WORLD_SIZE || new_y >= WORLD_SIZE)
+        if (new_x >= WorldRules::world_width || new_y >= WorldRules::world_height)
             return 0;
 
         m_energy -= energy;

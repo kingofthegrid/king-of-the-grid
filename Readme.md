@@ -10,11 +10,13 @@ bots to compete on the most efficient algorithm to be King Of The Grid!
 
 # Game Rules
 
+* See [rules.cpp](src/rules.cpp) for exact rules (how often, what values etc).
 * World size: 32x32 cells
 * Two bots (or programs) spawn in top-left and bottom-right corners
-* Each bot has a set of energy. See [defines.h](include/defines.h) for exact values.
+* Each bot has a set of energy. See [rules.cpp](src/rules.cpp) for exact values.
 * Bots run on Z80 CPU. See CPUs section.
 * Food (static) and prey (moves) are spawned periodically.
+* Food is not spawned evenly: random noise is applied using [FastNoiseLite](https://github.com/Auburn/FastNoiseLite) on rules described on [seasons.cpp](src/seasons.cpp)
 * Both can move around, eat, scan environment and clone themselves. See [bot_api.h](bot-api/bot_api.h)
 * Bot that survives the longest, wins.
 * If both bots survive for too long, it's a draw.
@@ -67,6 +69,9 @@ Game outputs files `<a>-<b>-<seed>.txt` which you can play using [asciinema.org]
 ```bash
 asciinema play <a>-<b>-<seed>.txt
 ```
+
+Export `KOTG_AUTOPLAY=1` to play results automatically.
+Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 
 # CPUs
 

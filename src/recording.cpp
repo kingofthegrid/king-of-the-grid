@@ -1,5 +1,6 @@
 #include "recording.h"
 #include "world.h"
+#include "rules.h"
 
 #include <iostream>
 #include <cstring>
@@ -16,8 +17,8 @@ Recording::Recording(World& world, const std::string& name, const std::string& t
 {
     std::cout << "Recording enabled: " << name << std::endl;
 
-    m_stream << "{\"version\": 2, \"width\": " << RECORDING_SIZE_X + RECORDING_OFFSET_X <<
-        ", \"height\": " << RECORDING_SIZE_Y + RECORDING_OFFSET_Y + RECORDING_STDOUT + 2 <<
+    m_stream << "{\"version\": 2, \"width\": " << (WorldRules::world_width * RECORDING_SIZE_X_MP) + RECORDING_OFFSET_X <<
+        ", \"height\": " << (WorldRules::world_height * RECORDING_SIZE_Y_MP) + RECORDING_OFFSET_Y + RECORDING_STDOUT + 2 <<
         ", \"timestamp\": 1504467315, \"title\": \"" << title << "\", \"env\": {\"TERM\": \"xterm-256color\", \"SHELL\": \"/bin/zsh\"}}"
         << std::endl;
     m_stream << std::fixed << std::setprecision(6);
@@ -28,34 +29,34 @@ Recording::Recording(World& world, const std::string& name, const std::string& t
     {
         {
             std::stringstream top;
-            top << "+" << std::string(RECORDING_SIZE_X, '-') << "+";
+            top << "+" << std::string((WorldRules::world_width * RECORDING_SIZE_X_MP), '-') << "+";
             log(RECORDING_OFFSET_X - 1, RECORDING_OFFSET_Y - 1, top.str(), 37);
         }
 
-        for (int i = 0; i < WORLD_SIZE; ++i) {
+        for (int i = 0; i < WorldRules::world_height; ++i) {
             std::stringstream row;
-            row << "|" << std::string(RECORDING_SIZE_X, ' ') << "|";
+            row << "|" << std::string(WorldRules::world_width * RECORDING_SIZE_X_MP, ' ') << "|";
             log(RECORDING_OFFSET_X - 1, RECORDING_OFFSET_Y + i, row.str(), 37);
         }
 
         {
             std::stringstream bottom;
-            bottom << "+" << std::string(RECORDING_SIZE_X, '-') << "+";
-            log(RECORDING_OFFSET_X - 1, RECORDING_OFFSET_Y + WORLD_SIZE, bottom.str(), 37);
+            bottom << "+" << std::string(WorldRules::world_width * RECORDING_SIZE_X_MP, '-') << "+";
+            log(RECORDING_OFFSET_X - 1, RECORDING_OFFSET_Y + WorldRules::world_height, bottom.str(), 37);
         }
     }
 }
 
 void Recording::start()
 {
-    log(1, RECORDING_OFFSET_Y + WORLD_SIZE + 1, get_stdout(0).name + ":", 37);
-    log(1 + WORLD_SIZE * RECORDING_SIZE_X_MP / 2, RECORDING_OFFSET_Y + WORLD_SIZE + 1, get_stdout(1).name + ":", 37);
+    log(1, RECORDING_OFFSET_Y + WorldRules::world_height + 1, get_stdout(0).name + ":", 37);
+    log(1 + WorldRules::world_width * RECORDING_SIZE_X_MP / 2, RECORDING_OFFSET_Y + WorldRules::world_height + 1, get_stdout(1).name + ":", 37);
 }
 
 Recording::~Recording()
 {
     m_stream << "[" << timestamp() << ", \"o\", \"" <<
-    "\\u001b[" << WORLD_SIZE + RECORDING_OFFSET_Y + RECORDING_STDOUT + 2 << ";" << 0 << "H"
+    "\\u001b[" << WorldRules::world_height + RECORDING_OFFSET_Y + RECORDING_STDOUT + 2 << ";" << 0 << "H"
      << "\"]" << std::endl;
 }
 
@@ -94,16 +95,16 @@ void Recording::add_stdout(int index, const std::string& v)
 
     o.log[0] = v;
 
-    if (o.log[0].length() < (WORLD_SIZE / 2) * RECORDING_SIZE_X_MP)
+    if (o.log[0].length() < (WorldRules::world_width / 2) * RECORDING_SIZE_X_MP)
     {
-        o.log[0].resize((WORLD_SIZE / 2) * RECORDING_SIZE_X_MP, ' ');
+        o.log[0].resize((WorldRules::world_width / 2) * RECORDING_SIZE_X_MP, ' ');
     }
 
-    int offset_x = index == 0 ? 0 : WORLD_SIZE * RECORDING_SIZE_X_MP / 2;
+    int offset_x = index == 0 ? 0 : WorldRules::world_width * RECORDING_SIZE_X_MP / 2;
 
     for (int i = 0; i < RECORDING_STDOUT; i++)
     {
-        log(1 + offset_x, WORLD_SIZE + RECORDING_OFFSET_Y + 2 + i, o.log[i], 36);
+        log(1 + offset_x, WorldRules::world_height + RECORDING_OFFSET_Y + 2 + i, o.log[i], 36);
     }
 }
 
@@ -130,26 +131,26 @@ void Recording::new_cell(int x, int y, int index)
     {
         case CELL_FOOD:
         {
-            v = ".#.";
+            v = "<%>";
             color = 33;
             break;
         }
         case CELL_PREY:
         {
-            v = ".&.";
+            v = "(~)";
             color = 32;
             break;
         }
         case CELL_BOT_A:
         {
-            v = "[A]";
+            v = "[1]";
             color = 91;
             break;
         }
         case CELL_BOT_B:
         default:
         {
-            v = "[B]";
+            v = "[2]";
             color = 95;
             break;
         }

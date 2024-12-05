@@ -21,6 +21,7 @@ add_executable(kotg ${kotg_FILES})
 target_link_libraries(kotg PUBLIC Z80)
 
 target_include_directories(kotg PUBLIC "include")
+target_include_directories(kotg PUBLIC "external/FastNoise")
 
 set_target_properties(kotg
     PROPERTIES

@@ -37,7 +37,7 @@ private:
 
 struct scan_t
 {
-    char scan_result[SCAN_SIZE_SQ];
+    std::vector<char> scan_result;
 };
 
 class CPUBot: public Bot

@@ -2,6 +2,7 @@
 #include "world.h"
 #include "frontend.h"
 #include "recording.h"
+#include "rules.h"
 
 #include <iostream>
 #include <sstream>
@@ -22,6 +23,9 @@ Bot::Bot(Frontend& frontend, std::string&& name, World& world, int x, int y, int
 
 Bot::~Bot()
 {
+    if (!m_world.is_running())
+        return;
+
     if (m_clear_cell)
     {
         auto& cell = m_world.get_cell(m_x, m_y);
@@ -41,49 +45,12 @@ bool Bot::is_enemy(Bot* bot)
     return true;
 }
 
-float Bot::get_live_x() const
-{
-    switch (m_bot_state)
-    {
-        case BotState::moving:
-        case BotState::splitting:
-        {
-            float progress = (float)m_move_timer / (float)BOT_MOVE_TIME;
-            float move = (float)m_source_x + (float)(m_x - m_source_x) * progress;
-            return move;
-        }
-        default:
-        {
-            return m_x;
-        }
-    }
-}
-
-float Bot::get_live_y() const
-{
-    switch (m_bot_state)
-    {
-        case BotState::moving:
-        case BotState::splitting:
-        {
-            float progress = (float)m_move_timer / (float)BOT_MOVE_TIME;
-            float move = (float)m_source_y + (float)(m_y - m_source_y) * progress;
-            return move;
-        }
-        default:
-        {
-            return m_y;
-        }
-    }
-}
-
-
 void Bot::simulate()
 {
     if (m_bot_state != BotState::hibernating)
     {
         m_energy_timer++;
-        if (m_energy_timer >= BOT_TICK_ENERGY_EVERY)
+        if (m_energy_timer >= WorldRules::bot_energy_lost_every_nth_tick)
         {
             m_energy--;
             m_energy_timer = 0;
@@ -97,7 +64,7 @@ void Bot::simulate()
         {
             m_move_timer++;
 
-            if (m_move_timer >= BOT_MOVE_TIME)
+            if (m_move_timer >= WorldRules::time_to_move)
             {
                 m_bot_state = BotState::normal;
             }
@@ -154,7 +121,7 @@ void Bot::move(int x, int y)
     if (new_x < 0 || new_y < 0)
         return;
 
-    if (new_x >= WORLD_SIZE || new_y >= WORLD_SIZE)
+    if (new_x >= WorldRules::world_width || new_y >= WorldRules::world_height)
         return;
 
     Bot* eating = nullptr;
@@ -186,7 +153,7 @@ void Bot::move(int x, int y)
 
     if (new_cell.is_food())
     {
-        int food = new_cell.m_food_value * FOOD_ENERGY_MULTIPLIER;
+        int food = new_cell.m_food_value * WorldRules::food_energy_multiplier;
         std::cout << "Bot " << get_name() << " ate " << food << " of food " << std::endl;
 
         if (!is_prey())
@@ -201,9 +168,9 @@ void Bot::move(int x, int y)
 
         m_energy += food;
 
-        if (m_energy > BOT_MAX_ENERGY)
+        if (m_energy > WorldRules::bot_energy_max)
         {
-            m_energy = BOT_MAX_ENERGY;
+            m_energy = WorldRules::bot_energy_max;
         }
     }
 
@@ -235,7 +202,7 @@ void Bot::move(int x, int y)
         m_world.get_recording()->new_cell(new_x, new_y, get_bot_type());
     }
 
-    m_energy -= BOT_MOVE_ENERGY;
+    m_energy -= WorldRules::energy_to_move;
     m_move_timer = 0;
     m_bot_state = BotState::moving;
 }

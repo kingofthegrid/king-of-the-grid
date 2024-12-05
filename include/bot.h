@@ -2,12 +2,6 @@
 
 #include <string>
 
-#define BOT_MAX_ENERGY (65536)
-#define BOT_WARNING_ENERGY (10000)
-#define BOT_MOVE_TIME (100)
-#define BOT_MOVE_ENERGY (500)
-#define BOT_TICK_ENERGY_EVERY (10)
-
 class World;
 class Frontend;
 
@@ -48,9 +42,6 @@ public:
     int get_x() const { return m_x; }
     int get_y() const { return m_y; }
     int get_id() const { return m_id; }
-
-    float get_live_x() const;
-    float get_live_y() const;
 
     void move_left();
     void move_right();

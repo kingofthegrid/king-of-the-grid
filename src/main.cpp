@@ -8,6 +8,7 @@
 #include "recording.h"
 #include "server_frontend.h"
 #include "cpu_bot.h"
+#include "rules.h"
 
 using namespace std::chrono;
 
@@ -49,8 +50,16 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
 
     std::unique_ptr<Frontend> frontend = std::make_unique<ServerFrontend>(*world);
 
-    world->add_bot(*frontend, new CPUBot(*frontend, program1, *world, 0, 0, BOT_MAX_ENERGY));
-    world->add_bot(*frontend, new CPUBot(*frontend, program2, *world, WORLD_SIZE - 1, WORLD_SIZE - 1, BOT_MAX_ENERGY));
+    world->add_bot(*frontend, new CPUBot(
+        *frontend, program1, *world,
+        0, 0,
+        WorldRules::bot_energy_spawn));
+
+    world->add_bot(*frontend, new CPUBot(
+        *frontend, program2, *world,
+        WorldRules::world_width - 1,
+        WorldRules::world_height - 1,
+        WorldRules::bot_energy_spawn));
 
     world->start();
 
@@ -71,7 +80,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
             {
                 world->get_recording()->event(">>>>>>>>>>>> Game ended with Draw.");
             }
-            break;
+            world->stop();
         }
         else if (program1.lost())
         {
@@ -80,7 +89,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
                 world->get_recording()->event(">>>>>>>>>>>> Program " + program2.get_name() + " (2) won.");
             }
             result = 2;
-            break;
+            world->stop();
         }
         else if (program2.lost())
         {
@@ -89,19 +98,21 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
                 world->get_recording()->event(">>>>>>>>>>>> Program " + program1.get_name() + " (1) won.");
             }
             result = 1;
-            break;
+            world->stop();
         }
 
         limit++;
-        if (limit > ITERATION_LIMIT)
+        if (limit > WorldRules::world_iteration_limit)
         {
-            std::cout << "Reached limit of " << ITERATION_LIMIT << " iterations. " << std::endl;
+            std::cout << "Reached limit of " << WorldRules::world_iteration_limit << " iterations. " << std::endl;
             if (world->get_recording())
             {
-                world->get_recording()->event(std::string("Reached limit of ") + std::to_string(ITERATION_LIMIT) + " iterations.");
+                world->get_recording()->event(
+                    std::string("Reached limit of ") + std::to_string(WorldRules::world_iteration_limit) +
+                    " iterations.");
             }
             result = 0;
-            break;
+            world->stop();
         }
     }
 
@@ -140,6 +151,21 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
     std::cout << "    " << recording_name << std::endl;
 
     std::cout << "============================================================" << std::endl;
+    std::cout << "Define KOTG_AUTOPLAY=1 to play automatically." << std::endl;
+    std::cout << "Define KOTG_AUTOUPLOAD=1 to upload automatically." << std::endl;
+
+
+    if (getenv("KOTG_AUTOUPLOAD"))
+    {
+        std::string s = "asciinema upload " + recording_name;
+        std::system(s.c_str());
+    }
+    else
+    if (getenv("KOTG_AUTOPLAY"))
+    {
+        std::string s = "asciinema play " + recording_name;
+        std::system(s.c_str());
+    }
 
     return result;
 }

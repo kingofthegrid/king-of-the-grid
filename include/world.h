@@ -7,6 +7,7 @@
 
 #include "bot.h"
 #include "defines.h"
+#include "seasons.h"
 
 class Recording;
 
@@ -72,10 +73,13 @@ public:
     void start();
 
     std::unique_ptr<Recording>& get_recording() { return m_recording; }
+    std::mt19937& get_random_engine() { return m_random_engine; }
+    Seasons& get_seasons() { return m_seasons; }
 
 private:
-    std::array<Cell,  WORLD_SIZE_SQ> m_cells;
+    std::vector<Cell> m_cells;
     std::list<std::unique_ptr<Bot>> m_bots;
+    Seasons m_seasons;
 
     bool m_running;
     int m_cycle;

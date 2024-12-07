@@ -49,6 +49,7 @@ public:
     void move_down();
 
     virtual bool is_prey() const { return true; }
+    virtual bool is_cpu() const { return false; }
     virtual int get_bot_type() const = 0;
 
 protected:

@@ -34,11 +34,11 @@ int WorldRules::bot_energy_max
 
 /* Amount of energy bots are spawned with */
 int WorldRules::bot_energy_spawn
-    = 10000;
+    = 40000;
 
 /* How many ticks (z80) bot's CPU performs per tick */
 int WorldRules::bot_z80_ticks_per_tick
-    = 70000;
+    = 10000;
 
 /* Half of scan size (square size = bot_scan_half_size * 2 + 1) */
 int WorldRules::bot_scan_half_size
@@ -58,7 +58,7 @@ int WorldRules::food_decay_rate
 
 /* When food is eaten, bot receives energy * multiplier */
 int WorldRules::food_energy_multiplier
-    = 16;
+    = 64;
 
 /* Amount of energy needed to perform a scan */
 int WorldRules::energy_to_scan

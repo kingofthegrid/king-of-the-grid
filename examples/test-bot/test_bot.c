@@ -29,10 +29,12 @@ static char scan_food()
     return 0;
 }
 
+static int time_to_split = 20;
+
 int main()
 {
     printf("Hello, world!\n");
-    srand(0);
+    srand(bot_get_seed());
 
     bot_hibernate();
 
@@ -66,35 +68,54 @@ int main()
                     break;
                 }
             }
-        }
 
-        if (scan_food())
-        {
-            printf("Found food at %dx%d\n", food_x, food_y);
-            // found food
+            time_to_split--;
 
-            while (bot_get_x() < food_x)
+            if (time_to_split == 0)
             {
-                bot_move_right();
-            }
+                printf("Cloning myself!\n");
 
-            while (bot_get_x() > food_x)
-            {
-                bot_move_left();
-            }
+                time_to_split = 20;
 
-            while (bot_get_y() < food_y)
-            {
-                bot_move_down();
-            }
+                int clone_id;
 
-            while (bot_get_y() > food_y)
-            {
-                bot_move_up();
-            }
+                switch (rand() % 4) {
+                    case 0:
+                    {
+                        clone_id = bot_split_down(4000);
+                        break;
+                    }
+                    case 1:
+                    {
+                        clone_id = bot_split_up(4000);
+                        break;
+                    }
+                    case 2:
+                    {
+                        clone_id = bot_split_left(4000);
+                        break;
+                    }
+                    case 3:
+                    default:
+                    {
+                        clone_id = bot_split_right(4000);
+                        break;
+                    }
+                }
 
-            // we should have eaten the food
-            printf("Reached the food.\n");
+                if (clone_id == 0)
+                {
+                    // clone failed
+                }
+                else if (clone_id == bot_get_me())
+                {
+                    printf("I was just cloned!\n");
+                }
+                else
+                {
+                    printf("Cloned: %d!\n", clone_id);
+                }
+            }
         }
     }
 }

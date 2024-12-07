@@ -41,7 +41,7 @@ void World::simulate(Frontend& frontend)
 
             if (m_recording)
             {
-                m_recording->new_cell(x, y, Recording::CELL_FOOD);
+                m_recording->new_cell(x, y, Recording::CELL_FOOD, 1.0f);
             }
         }
     }
@@ -126,7 +126,7 @@ void World::add_bot(Frontend& frontend, Bot* bot)
 
     if (m_recording)
     {
-        m_recording->new_cell(bot->get_x(), bot->get_y(), bot->get_bot_type());
+        m_recording->new_cell(bot->get_x(), bot->get_y(), bot->get_bot_type(), (float)bot->get_energy() / WorldRules::bot_energy_max);
     }
 
     std::cout << "New bot added: " << bot->get_name() << std::endl;

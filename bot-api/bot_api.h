@@ -39,6 +39,9 @@ extern int bot_get_me();
 /* get current bot's remaining energy value. */
 extern int bot_get_energy();
 
+/* get current seed (randomness). */
+extern int bot_get_seed();
+
 /* Move bot up.
  * Blocks the execution until the bot has completed the movement.
  * Takes some energy. */
@@ -65,7 +68,10 @@ extern void bot_move_right();
  * If less energy is available, the bot will move there instead.
  * Blocks until cloning is complete.
  * Takes some energy (on top of energy that is given up to the clone.
- * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed. */
+ * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed.
+ * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
+ * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
+ * bot_get_me(). */
 extern int bot_split_up(int energy) __z88dk_fastcall;
 
 /* Make a clone of myself in the cell down.
@@ -74,7 +80,10 @@ extern int bot_split_up(int energy) __z88dk_fastcall;
  * If less energy is available, the bot will move there instead.
  * Blocks until cloning is complete.
  * Takes some energy (on top of energy that is given up to the clone.
- * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed. */
+ * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed.
+ * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
+ * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
+ * bot_get_me(). */
 extern int bot_split_down(int energy) __z88dk_fastcall;
 
 /* Make a clone of myself in the cell left.
@@ -83,7 +92,10 @@ extern int bot_split_down(int energy) __z88dk_fastcall;
  * If less energy is available, the bot will move there instead.
  * Blocks until cloning is complete.
  * Takes some energy (on top of energy that is given up to the clone.
- * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed.*/
+ * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed.
+ * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
+ * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
+ * bot_get_me().*/
 extern int bot_split_left(int energy) __z88dk_fastcall;
 
 /* Make a clone of myself in the cell right.
@@ -92,7 +104,10 @@ extern int bot_split_left(int energy) __z88dk_fastcall;
  * If less energy is available, the bot will move there instead.
  * Blocks until cloning is complete.
  * Takes some energy (on top of energy that is given up to the clone.
- * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed. */
+ * Returns ID of a newly created bot, current bot ID if it was moved instead or 0 if failed.
+ * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
+ * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
+ * bot_get_me(). */
 extern int bot_split_right(int energy) __z88dk_fastcall;
 
 /* Performs surrounding scan. Variable scan is modified.

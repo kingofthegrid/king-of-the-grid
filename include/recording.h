@@ -11,10 +11,11 @@
 #define RECORDING_SIZE_Y_MP (1)
 
 #define RECORDING_EVENTS (3)
-#define RECORDING_STDOUT (8)
+#define RECORDING_STDOUT (10)
 
 #define RECORDING_OFFSET_Y (6)
 #define RECORDING_OFFSET_X (2)
+#define RECORDING_STDOUT_WIDTH (32)
 
 class World;
 
@@ -37,10 +38,11 @@ public:
     void start();
     ~Recording();
 
-    void new_cell(int x, int y, int index);
+    void new_cell(int x, int y, int index, float intensity);
     void cell_removed(int x, int y);
     void event(const std::string& event);
     void log(int x, int y, const std::string& v, int color);
+    void log_ext(int x, int y, const std::string& v, int r, int g, int b);
     void iteration();
     void add_stdout(int index, const std::string& v);
     RecordingSTDOut& get_stdout(int index) { return m_stdouts[index]; }

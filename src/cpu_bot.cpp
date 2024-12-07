@@ -172,6 +172,12 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                     Z80_HL(*cpu) = computer->get_energy();
                     break;
                 }
+                case CMD_GET_SEED:
+                {
+                    auto* computer = (CPUBot*)cpu->context;
+                    Z80_HL(*cpu) = computer->get_seed();
+                    break;
+                }
                 default:
                 {
                     break;
@@ -240,15 +246,19 @@ CPUProgram::CPUProgram(const std::string& name, const std::string& filename, boo
     m_first(first),
     m_score(0)
 {
+    std::cout << "Reading program " << name << " ..." << std::endl;
+
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file: " + filename);
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        exit(-1);
     }
 
     std::streamsize file_size = file.tellg();
     if (file_size > sizeof(m_program))
     {
-        throw std::runtime_error("Program is too big: " + std::to_string(file_size));
+        std::cerr << "Program is too big: " << std::to_string(file_size) << std::endl;
+        exit(-1);
     }
 
     file.seekg(0, std::ios::beg); // Move back to the beginning
@@ -256,7 +266,8 @@ CPUProgram::CPUProgram(const std::string& name, const std::string& filename, boo
     // Read the data into the array
     if (!file.read(reinterpret_cast<char*>(m_program), file_size))
     {
-        throw std::runtime_error("Failed to read file data.");
+        std::cerr << "Failed to read file data." << std::endl;
+        exit(-1);
     }
 
     file.close();
@@ -268,7 +279,8 @@ CPUBot::CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int
     m_cpu {},
     m_private_memory {},
     m_stdout(),
-    m_stdout_total()
+    m_stdout_total(),
+    m_seed(world.get_seed())
 {
     m_program.add_count();
 
@@ -323,9 +335,11 @@ CPUBot::~CPUBot()
 
 bool CPUBot::is_enemy(Bot* bot)
 {
-    auto* other = dynamic_cast<CPUBot*>(bot);
-    if (other == nullptr)
+    if (!bot->is_cpu())
+    {
         return true;
+    }
+    auto* other = static_cast<CPUBot*>(bot);
     return &other->m_program != &m_program;
 }
 
@@ -424,6 +438,17 @@ int CPUBot::split(int x, int y, int energy)
         new_bot->m_source_x = get_x();
         new_bot->m_source_y = get_y();
         m_world.add_bot(m_frontend, new_bot);
+
+        // clone state and private memory to a new bot
+        // so when it executes, it gets the same context (PC & etc)
+        new_bot->m_cpu = m_cpu;
+        // fix context after
+        new_bot->m_cpu.context = new_bot;
+        memcpy(new_bot->m_private_memory, m_private_memory, sizeof(m_private_memory));
+
+        // fix HL for new context
+        Z80_HL(new_bot->m_cpu) = new_bot->get_id();
+
         new_bot->set_state(BotState::splitting);
         new_bot->m_move_timer = 0;
         return new_bot->get_id();

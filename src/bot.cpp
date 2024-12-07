@@ -129,6 +129,12 @@ void Bot::move(int x, int y)
 
     if (new_cell.is_bot())
     {
+        if (is_prey())
+        {
+            // prey can't eat other bots
+            return;
+        }
+
         if (new_cell.m_bot_value->is_enemy(this))
         {
             eating = new_cell.m_bot_value;
@@ -199,7 +205,7 @@ void Bot::move(int x, int y)
 
     if (m_world.get_recording())
     {
-        m_world.get_recording()->new_cell(new_x, new_y, get_bot_type());
+        m_world.get_recording()->new_cell(new_x, new_y, get_bot_type(), (float)m_energy / (float)WorldRules::bot_energy_max);
     }
 
     m_energy -= WorldRules::energy_to_move;

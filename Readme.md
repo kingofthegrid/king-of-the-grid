@@ -21,7 +21,22 @@ bots to compete on the most efficient algorithm to be King Of The Grid!
 * Bot that survives the longest, wins.
 * If both bots survive for too long, it's a draw.
 
-# How to build the game
+# Live demo
+
+See [speccytools.org/kotg](https://speccytools.org/kotg/)
+
+# Easiest: build and run web version
+
+Web version can be built with [Emscripten framework](https://emscripten.org/docs/getting_started/downloads.html).
+
+```bash
+make kotg-web
+cd bin
+python3 -m http.server 8000
+# Open http://localhost:8000/kotg.html in browser
+```
+
+# How to build the game in command line
 
 * Have `cmake` and `gcc` installed.
 * `git submodule update --init --recursive`
@@ -75,14 +90,15 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 
 # CPUs
 
-* Each bot runs on a Z80-equipped virtual machine.
+* Each bot runs on a Z80-equipped virtual machine, with limited Z80-ticks per game tick. So if your bot thinks a lot,
+  it is going to be outrun.
 * Bots can perform action according to API. See [bot_api.h](bot-api/bot_api.h)
 * `printf` is supported for debugging.
 * Each action consumes energy.
 * When bot decides to take action, execution stops until action is done.
 * Program address starts at address 8192, and program can be of size of up to 65536-8192=57344
 * First 8192 (0x0000 - 0x1FFF) of memory are SHARED across all bots. That way they can communicate.
-* Bots can clone (or fork) themselves in order to spread, or hibernate to preserve energy.
+* Bots can clone (or fork) themselves in order to spread, fork-bomb style, or hibernate to preserve energy.
 
 <table>
 <tr>

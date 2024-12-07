@@ -1,3 +1,6 @@
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
 #include <iostream>
 #include <thread>
 #include <cstdlib>
@@ -34,16 +37,31 @@ std::vector<std::string> find_bin_files(const std::string& folder_path)
     return result;
 }
 
-int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
+int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool simple_name)
 {
+    if (seed > 65535 || seed < 0)
+    {
+        std::cerr << "Seed range exceeded: " << seed << std::endl;
+        exit(-1);
+    }
+
     int result = 0;
     long limit = 0;
     std::unique_ptr<World> world = std::make_unique<World>(seed);
 
-    world->enable_recording("recording-" + program1.get_name() + "-" +
-        program2.get_name() + "-" + std::to_string(seed) + ".txt",
-        "King-Of-The-Grid | " + program1.get_name() + " vs " +
-        program2.get_name() + " seed " + std::to_string(seed));
+    std::string title = "King-Of-The-Grid | " + program1.get_name() + " vs " +
+        program2.get_name() + " seed " + std::to_string(seed);
+
+    if (simple_name)
+    {
+        world->enable_recording("recording.txt", title);
+    }
+    else
+    {
+        world->enable_recording("recording-" + program1.get_name() + "-" +
+            program2.get_name() + "-" + std::to_string(seed) + ".txt", title);
+
+    }
 
     world->get_recording()->get_stdout(0).name = program1.get_name();
     world->get_recording()->get_stdout(1).name = program2.get_name();
@@ -170,6 +188,25 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2)
     return result;
 }
 
+#ifdef EMSCRIPTEN
+extern "C" EMSCRIPTEN_KEEPALIVE
+int sum(int a, int b)
+{
+    return a + b;
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE
+int test_programs(char* program1_name, char* program2_name, int seed)
+{
+    std::cout << "Hello " << program1_name << " " << program2_name << " " << seed << std::endl;
+
+    std::unique_ptr<CPUProgram> first_program = std::make_unique<CPUProgram>(program1_name, program1_name, true);
+    std::unique_ptr<CPUProgram> second_program = std::make_unique<CPUProgram>(program2_name, program2_name, false);
+
+    int result = test_programs(seed, *first_program, *second_program, true);
+    return result;
+}
+#else
 int main(int argc, char** argv)
 {
     srand(time(0));
@@ -213,7 +250,7 @@ int main(int argc, char** argv)
                     std::cout << "-------------------" << std::endl;
 
                     {
-                        int result1 = test_programs(seed, it1->second, it2->second);
+                        int result1 = test_programs(seed, it1->second, it2->second, false);
 
                         std::cout << "-------------------" << std::endl;
                         switch (result1)
@@ -245,7 +282,7 @@ int main(int argc, char** argv)
 
                     // swap places
                     {
-                        int result2 = test_programs(seed, it2->second, it1->second);
+                        int result2 = test_programs(seed, it2->second, it1->second, false);
 
                         switch (result2)
                         {
@@ -349,7 +386,8 @@ int main(int argc, char** argv)
         CPUProgram first_program(program1_name, program1_name + ".bin", true);
         CPUProgram second_program(program2_name, program2_name + ".bin", false);
 
-        int result = test_programs(seed, first_program, second_program);
+        int result = test_programs(seed, first_program, second_program, false);
         return result;
     }
 }
+#endif

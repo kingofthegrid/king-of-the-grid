@@ -22,6 +22,7 @@ DEFC SPLIT_LEFT = 110
 DEFC SPLIT_RIGHT = 111
 DEFC SCAN = 112
 DEFC HIBERNATE = 113
+DEFC GET_SEED = 114
 
 syscall:
   defb $ED, $FE
@@ -104,6 +105,16 @@ int bot_get_energy()
 #ifndef __IDE__
 #asm
     ld a, GET_ENERGY
+    call syscall
+#endasm
+#endif
+}
+
+int bot_get_seed()
+{
+#ifndef __IDE__
+#asm
+    ld a, GET_SEED
     call syscall
 #endasm
 #endif

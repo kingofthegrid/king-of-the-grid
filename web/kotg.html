@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>King Of The Grid</title>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="asciinema-player.css" rel="stylesheet">
+    <link href="bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .game-panel {
+            height: 400px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+<div class="container my-4">
+    <div id="game-header"><h1 class="text-center">King Of The Grid</h1></div>
+
+    <div class="row mb-4" id="bots-selector">
+        <!-- Bot A Section -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    Bot A <span id="bot-a-selected" class="float-right"></span>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input btn-primary" id="bot-a-file">
+                            <label class="custom-file-label" id="bot-a-file-name" for="bot-a-file">Choose file</label>
+                        </div>
+                    </div>
+                    <select id="bot-a-select" class="custom-select mt-3">
+                        <option value="" disabled selected>Loading...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2 align-content-center text-center">
+            <span class="text-info">Select or upload<br/> bots A and B<br/>
+            <i class="bi bi-arrow-left-right"></i><br/>
+            to see how they compete!</span>
+            <div class="form-group">
+                <label class="col-form-label text-success" for="seed">Seed</label>
+                <input type="text" class="form-control" value="1337" placeholder="Any number 0-65536" id="seed">
+            </div>
+        </div>
+
+        <!-- Bot B Section -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    Bot B <span id="bot-b-selected" class="float-right"></span>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input btn-primary" id="bot-b-file">
+                            <label class="custom-file-label" id="bot-b-file-name" for="bot-a-file">Choose file</label>
+                        </div>
+                    </div>
+                    <select id="bot-b-select" class="custom-select mt-3">
+                        <option value="" disabled selected>Loading...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center" id="game-panel" style="display: none;">
+        <div class="col-md-10 mb-3" id="game-panel-body">
+            <div class="card">
+                <div class="card-header">
+                    <span id="game-panel-title">Game Panel</span>
+                </div>
+                <div class="card-body">
+                    <div id="asciinema-player">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    System Log
+                </div>
+                <div class="card-body">
+                    <div id="systme-log">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="jquery-3.7.1.min.js"></script>
+<script src="kotg-web.js"></script>
+<script src="kotg.js" type="text/javascript"></script>
+<script src="bootstrap.bundle.min.js"></script>
+<script src="asciinema-player.min.js"></script>
+</body>
+</html>

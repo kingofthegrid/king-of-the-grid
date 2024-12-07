@@ -60,7 +60,9 @@ public:
     const CPUProgram& get_program() const { return m_program; }
 
     bool is_prey() const override { return false; }
+    bool is_cpu() const override { return true; }
     int get_bot_type() const override;
+    int get_seed() const { return m_seed; }
 
 private:
     CPUProgram& m_program;
@@ -68,4 +70,5 @@ private:
     uint8_t m_private_memory[TOTAL_MEM_SIZE];
     std::stringstream m_stdout;
     std::stringstream m_stdout_total;
+    int m_seed;
 };

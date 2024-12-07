@@ -17,8 +17,11 @@ Recording::Recording(World& world, const std::string& name, const std::string& t
 {
     std::cout << "Recording enabled: " << name << std::endl;
 
-    m_stream << "{\"version\": 2, \"width\": " << (WorldRules::world_width * RECORDING_SIZE_X_MP) + RECORDING_OFFSET_X <<
-        ", \"height\": " << (WorldRules::world_height * RECORDING_SIZE_Y_MP) + RECORDING_OFFSET_Y + RECORDING_STDOUT + 2 <<
+    int console_width = (WorldRules::world_width * RECORDING_SIZE_X_MP) + RECORDING_OFFSET_X + RECORDING_STDOUT_WIDTH + 2;
+    int console_height = (WorldRules::world_height * RECORDING_SIZE_Y_MP) + RECORDING_OFFSET_Y;
+
+    m_stream << "{\"version\": 2, \"width\": " << console_width <<
+        ", \"height\": " << console_height <<
         ", \"timestamp\": 1504467315, \"title\": \"" << title << "\", \"env\": {\"TERM\": \"xterm-256color\", \"SHELL\": \"/bin/zsh\"}}"
         << std::endl;
     m_stream << std::fixed << std::setprecision(6);
@@ -49,14 +52,16 @@ Recording::Recording(World& world, const std::string& name, const std::string& t
 
 void Recording::start()
 {
-    log(1, RECORDING_OFFSET_Y + WorldRules::world_height + 1, get_stdout(0).name + ":", 37);
-    log(1 + WorldRules::world_width * RECORDING_SIZE_X_MP / 2, RECORDING_OFFSET_Y + WorldRules::world_height + 1, get_stdout(1).name + ":", 37);
+    log(RECORDING_OFFSET_X + WorldRules::world_width * RECORDING_SIZE_X_MP + 2,
+        RECORDING_OFFSET_Y - 1, get_stdout(0).name + ":", 37);
+    log(RECORDING_OFFSET_X + WorldRules::world_width * RECORDING_SIZE_X_MP + 2,
+        RECORDING_OFFSET_Y + (WorldRules::world_height / 2) - 1, get_stdout(1).name + ":", 37);
 }
 
 Recording::~Recording()
 {
     m_stream << "[" << timestamp() << ", \"o\", \"" <<
-    "\\u001b[" << WorldRules::world_height + RECORDING_OFFSET_Y + RECORDING_STDOUT + 2 << ";" << 0 << "H"
+    "\\u001b[" << WorldRules::world_height + RECORDING_OFFSET_Y + 2 << ";" << 0 << "H"
      << "\"]" << std::endl;
 }
 
@@ -95,16 +100,17 @@ void Recording::add_stdout(int index, const std::string& v)
 
     o.log[0] = v;
 
-    if (o.log[0].length() < (WorldRules::world_width / 2) * RECORDING_SIZE_X_MP)
+    if (o.log[0].length() != RECORDING_STDOUT_WIDTH)
     {
-        o.log[0].resize((WorldRules::world_width / 2) * RECORDING_SIZE_X_MP, ' ');
+        o.log[0].resize(RECORDING_STDOUT_WIDTH, ' ');
     }
 
-    int offset_x = index == 0 ? 0 : WorldRules::world_width * RECORDING_SIZE_X_MP / 2;
+    int offset_y = index == 0 ? 0 : (WorldRules::world_height / 2) * RECORDING_SIZE_Y_MP;
 
     for (int i = 0; i < RECORDING_STDOUT; i++)
     {
-        log(1 + offset_x, WorldRules::world_height + RECORDING_OFFSET_Y + 2 + i, o.log[i], 36);
+        log(RECORDING_OFFSET_X + WorldRules::world_width * RECORDING_SIZE_X_MP + 2,
+            RECORDING_OFFSET_Y + offset_y + i, o.log[i], 36);
     }
 }
 
@@ -122,41 +128,69 @@ void Recording::log(int x, int y, const std::string& v, int color)
         << "\"]" << std::endl;
 }
 
-void Recording::new_cell(int x, int y, int index)
+void Recording::log_ext(int x, int y, const std::string& v, int r, int g, int b)
+{
+    int color_index = 16 + (36 * std::clamp(r, 0, 5)) + (6 * std::clamp(g, 0, 5)) + std::clamp(b, 0, 5);
+
+    m_stream << "[" << timestamp() << ", \"o\", \"" <<
+        "\\u001b[" << y << ";" << x<< "H"
+        << "\\u001b[38;5;" << color_index << "m"
+        << v
+        << "\"]" << std::endl;
+}
+
+void Recording::new_cell(int x, int y, int index, float intensity)
 {
     const char* v;
-    int color;
+
+    intensity = std::clamp(intensity, 0.f, 1.0f);
+
+    int r;
+    int g;
+    int b;
 
     switch (index)
     {
         case CELL_FOOD:
         {
             v = "<%>";
-            color = 33;
+            r = 2;
+            g = 2;
+            b = 2;
             break;
         }
         case CELL_PREY:
         {
             v = "(~)";
-            color = 32;
+            r = 5;
+            g = 5;
+            b = 5;
             break;
         }
         case CELL_BOT_A:
         {
-            v = "[1]";
-            color = 91;
+            v = "{1}";
+
+            r = 5 - int(intensity * 5);
+            g = int(intensity * 5);
+            b = 0;
+
             break;
         }
         case CELL_BOT_B:
         default:
         {
-            v = "[2]";
-            color = 95;
+            v = "{2}";
+
+            r = 5 - int(intensity * 5);
+            g = int(intensity * 5);
+            b = 0;
+
             break;
         }
     }
 
-    log(x * RECORDING_SIZE_X_MP + RECORDING_OFFSET_X, y * RECORDING_SIZE_Y_MP + RECORDING_OFFSET_Y, v, color);
+    log_ext(x * RECORDING_SIZE_X_MP + RECORDING_OFFSET_X, y * RECORDING_SIZE_Y_MP + RECORDING_OFFSET_Y, v, r, g, b);
 }
 
 void Recording::cell_removed(int x, int y)

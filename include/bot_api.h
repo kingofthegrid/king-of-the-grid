@@ -12,3 +12,4 @@
 #define CMD_SPLIT_RIGHT 111
 #define CMD_SCAN 112
 #define CMD_HIBERNATE 113
+#define CMD_GET_SEED 114

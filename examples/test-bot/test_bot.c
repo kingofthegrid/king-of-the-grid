@@ -29,8 +29,6 @@ static char scan_food()
     return 0;
 }
 
-static int time_to_split = 20;
-
 int main()
 {
     printf("Hello, world!\n");
@@ -40,7 +38,7 @@ int main()
 
     while (1)
     {
-        for (char i = 0; i < 5; i++)
+        for (int i = 0; i < 20; i++)
         {
             switch (rand() % 4) {
                 case 0:
@@ -68,54 +66,47 @@ int main()
                     break;
                 }
             }
+        }
 
-            time_to_split--;
+        printf("Cloning myself!\n");
 
-            if (time_to_split == 0)
+        int clone_id;
+
+        switch (rand() % 4) {
+            case 0:
             {
-                printf("Cloning myself!\n");
-
-                time_to_split = 20;
-
-                int clone_id;
-
-                switch (rand() % 4) {
-                    case 0:
-                    {
-                        clone_id = bot_split_down(4000);
-                        break;
-                    }
-                    case 1:
-                    {
-                        clone_id = bot_split_up(4000);
-                        break;
-                    }
-                    case 2:
-                    {
-                        clone_id = bot_split_left(4000);
-                        break;
-                    }
-                    case 3:
-                    default:
-                    {
-                        clone_id = bot_split_right(4000);
-                        break;
-                    }
-                }
-
-                if (clone_id == 0)
-                {
-                    // clone failed
-                }
-                else if (clone_id == bot_get_me())
-                {
-                    printf("I was just cloned!\n");
-                }
-                else
-                {
-                    printf("Cloned: %d!\n", clone_id);
-                }
+                clone_id = bot_split_down(4000);
+                break;
             }
+            case 1:
+            {
+                clone_id = bot_split_up(4000);
+                break;
+            }
+            case 2:
+            {
+                clone_id = bot_split_left(4000);
+                break;
+            }
+            case 3:
+            default:
+            {
+                clone_id = bot_split_right(4000);
+                break;
+            }
+        }
+
+        if (clone_id == 0)
+        {
+            // clone failed
+        }
+        else if (clone_id == bot_get_me())
+        {
+            printf("I was just cloned!\n");
+        }
+        else
+        {
+            printf("Cloned: %d!\n", clone_id);
         }
     }
 }

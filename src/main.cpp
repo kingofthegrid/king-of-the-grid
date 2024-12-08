@@ -243,7 +243,7 @@ int main(int argc, char** argv)
             {
                 for (int i = 1; i <= 3; i++)
                 {
-                    int seed = rand();
+                    int seed = rand() & 0xFFFF;
 
                     std::cout << "-------------------" << std::endl;
                     std::cout << " TAKE #" << i << " testing programs " << it1->first << " and " << it2->first << " on seed " << seed << "." << std::endl;
@@ -258,14 +258,14 @@ int main(int argc, char** argv)
                             case 1:
                             {
                                 it1->second.bump_score();
-                                wins[it1->first].push_back("\"" + it1->first + " " + it2->first + " " + std::to_string(seed) + "\"");
+                                wins[it1->first].push_back("recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt");
                                 std::cout << "A: Program " << it1->first << " (1) won." << std::endl;
                                 break;
                             }
                             case 2:
                             {
                                 it2->second.bump_score();
-                                wins[it2->first].push_back("\"" + it1->first + " " + it2->first + " " + std::to_string(seed) + "\"");
+                                wins[it2->first].push_back("recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt");
                                 std::cout << "A: Program " << it2->first << " (2) won." << std::endl;
                                 break;
                             }
@@ -289,14 +289,14 @@ int main(int argc, char** argv)
                             case 1:
                             {
                                 it2->second.bump_score();
-                                wins[it2->first].push_back("\"" + it2->first + " " + it1->first + " " + std::to_string(seed) + "\"");
+                                wins[it2->first].push_back("recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt");
                                 std::cout << "B: Program " << it2->first << " (2) won." << std::endl;
                                 break;
                             }
                             case 2:
                             {
                                 it1->second.bump_score();
-                                wins[it1->first].push_back("\"" + it2->first + " " + it1->first + " " + std::to_string(seed) + "\"");
+                                wins[it1->first].push_back("recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt");
                                 std::cout << "B: Program " << it1->first << " (1) won." << std::endl;
                                 break;
                             }
@@ -319,33 +319,63 @@ int main(int argc, char** argv)
         {
             std::stringstream outcome;
 
-            int index = 1;
+            outcome << "[";
 
-            for (auto p: programs)
+            std::vector<CPUProgram*> sorted_programs;
+
+            // Populate vector with pointers
+            for (auto& [key, value] : programs)
             {
-                outcome << index << ". " << p.first << " | " << p.second.get_score() << " win(s) | ";
-                index++;
+                sorted_programs.push_back(&value);
+            }
+
+            // Sort the vector based on a custom criteria
+            std::sort(sorted_programs.begin(), sorted_programs.end(),
+                [](CPUProgram* a, CPUProgram* b)
+            { return a->get_score() > b->get_score(); });
+
+            bool first_program = true;
+
+            for (auto p: sorted_programs)
+            {
+                if (first_program)
+                {
+                    first_program = false;
+                }
+                else
+                {
+                    outcome << "," << std::endl;
+                }
+
+                outcome << "{" << std::endl;
+                outcome << "    \"bot\": \"" << p->get_name() << "\"," << std::endl;
+                outcome << "    \"score\": " << p->get_score() << "," << std::endl;
+                outcome << "    \"wins\": [";
 
                 bool first = true;
-                for (const auto& win: wins[p.first])
+                for (const auto& win: wins[p->get_name()])
                 {
                     if (first)
                     {
                         first = false;
-                        outcome << win;
+                        outcome << "\"" << win << "\"";
                     }
                     else
                     {
-                        outcome << ", " << win;
+                        outcome << ", \"" << win << "\"";
                     }
                 }
-                outcome << std::endl;
+
+                outcome << "]" << std::endl;
+                outcome << "}";
             }
+
+            outcome << "]" << std::endl;
 
             std::cout << outcome.str();
 
             {
-                std::ofstream fo("outcome.txt");
+                std::ofstream fo("outcome.json");
                 fo << outcome.str();
             }
         }
@@ -378,7 +408,7 @@ int main(int argc, char** argv)
         else
         {
             srand(time(0));
-            seed = rand();
+            seed = rand() & 0xFFFF;
 
             std::cout << "Seed not provided. Using random: " << seed << std::endl;
         }

@@ -1,2 +1,0 @@
-testbot.bin
-dumbbot.bin

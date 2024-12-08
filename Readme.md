@@ -23,7 +23,7 @@ bots to compete on the most efficient algorithm to be King Of The Grid!
 
 # Live demo
 
-See [speccytools.org/kotg](https://speccytools.org/kotg/)
+See [kingofthegrid.com](https://kingofthegrid.com/run.html)
 
 # Easiest: build and run web version
 

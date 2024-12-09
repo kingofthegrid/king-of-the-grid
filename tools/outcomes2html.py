@@ -27,7 +27,8 @@ html_content = f"""
 <body>
     <div class="container mt-5">
         <div id="game-header" class="text-center mb-4">
-            <img src="kotg.png" width="128px"><br/>
+            <img src="kotg.png" width="128px" class="mb-4"><br/>
+            A Z80 Sandbox Competition Game in which developers can write bots to compete on the most efficient algorithm to be King Of The Grid!
         </div>
         <div class="card border-success">
             <div class="card-header">

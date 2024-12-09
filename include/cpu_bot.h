@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
+#include <vector>
 #include "bot.h"
 #include "Z80.h"
 #include "defines.h"

@@ -118,10 +118,12 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 
 * [Download z88dk](https://github.com/z88dk/z88dk/releases) or install z88dk from sources:
   ```bash
+  # dependencies
+  sudo apt install -y cmake git build-essential libxml2 libxml2-dev m4 perl
   git clone https://github.com/z88dk/z88dk.git
   cd z88dk
   git submodule update --init --recursive
-  ./build.sh -p test
+  ./build.sh -p zx
   sudo make install
   ```
 

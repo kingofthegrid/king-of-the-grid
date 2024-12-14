@@ -116,6 +116,11 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 
 # How to write your Bot
 
+<div align="center">
+  <img src="doc/example-build.gif"/><br/>
+  Example of how to build a bot.
+</div>
+
 * [Download z88dk](https://github.com/z88dk/z88dk/releases) or install z88dk from sources:
   ```bash
   # dependencies

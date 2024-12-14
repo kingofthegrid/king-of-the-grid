@@ -131,8 +131,9 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
   ./build.sh -p zx
   sudo make install
   ```
-
-* See [example bot](./examples/test-bot) for an example on how to build with C and z88dk
+* Include `bot_api.h` and `bot_api.c` from [bot-api](bot-api) folder in your project.
+* See [example bot](./examples/test-bot) for an example on how to build with C and z88dk.
+  It uses CMake, but you can build with just zcc: `zcc +test bot_api.c <program>.c -o mybot.bin`
 * If you prefer assembly, see section below.
 
 # I don't like z88dk or C for that matter

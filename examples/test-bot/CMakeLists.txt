@@ -7,5 +7,6 @@ message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
 message(STATUS "Target: ${ZCCTARGET}")
 
 project(testbot C)
-add_executable(testbot bot_api.c test_bot.c)
+add_executable(testbot ../../bot-api/bot_api.c test_bot.c )
+target_include_directories(testbot PUBLIC "../../bot-api")
 target_link_options(testbot PUBLIC "-zorg=8192")

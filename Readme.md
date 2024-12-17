@@ -135,7 +135,8 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
   git clone --recursive https://github.com/z88dk/z88dk.git
   cd z88dk
   # takes a while (10+m)
-  ./build.sh -p zx test
+  ./build.sh -p zx
+  ./build.sh -k -p test
   sudo make install
   ```
 * Include `bot_api.h` and `bot_api.c` from [bot-api](bot-api) folder in your project.

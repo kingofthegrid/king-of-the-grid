@@ -123,13 +123,19 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 
 * [Download z88dk](https://github.com/z88dk/z88dk/releases) or install z88dk from sources:
   ```bash
-  # dependencies
-  sudo apt install -y cmake git build-essential libxml2 libxml2-dev m4 perl
-  git clone https://github.com/z88dk/z88dk.git
+  # dependencies on Ubuntu
+  sudo apt install -y cmake git build-essential libxml2 libxml2-dev m4 perl                                                                           
+  
+  # dependencies on Mac
+  brew install gmp libxml2 pkgconf
+  # add the following to your bashrc
+  # export CFLAGS="-I/opt/homebrew/include"
+  # export LDFLAGS="-L/opt/homebrew/lib"
+  
+  git clone --recursive https://github.com/z88dk/z88dk.git
   cd z88dk
-  git submodule update --init --recursive
   ./build.sh -p zx
-  sudo make install
+  [sudo] make install
   ```
 * Include `bot_api.h` and `bot_api.c` from [bot-api](bot-api) folder in your project.
 * See [example bot](./examples/test-bot) for an example on how to build with C and z88dk.

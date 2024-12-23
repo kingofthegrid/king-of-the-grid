@@ -34,13 +34,13 @@ extern char bot_get_x();
 extern char bot_get_y();
 
 /* get current bot's ID. */
-extern int bot_get_me();
+extern unsigned int bot_get_me();
 
 /* get current bot's remaining energy value. */
-extern int bot_get_energy();
+extern unsigned int bot_get_energy();
 
 /* get current seed (randomness). */
-extern int bot_get_seed();
+extern unsigned int bot_get_seed();
 
 /* Move bot up.
  * Blocks the execution until the bot has completed the movement.

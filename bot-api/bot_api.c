@@ -90,7 +90,7 @@ char bot_get_y()
 #endif
 }
 
-int bot_get_me()
+unsigned int bot_get_me()
 {
 #ifndef __IDE__
 #asm
@@ -100,7 +100,7 @@ int bot_get_me()
 #endif
 }
 
-int bot_get_energy()
+unsigned int bot_get_energy()
 {
 #ifndef __IDE__
 #asm
@@ -110,7 +110,7 @@ int bot_get_energy()
 #endif
 }
 
-int bot_get_seed()
+unsigned int bot_get_seed()
 {
 #ifndef __IDE__
 #asm

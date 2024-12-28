@@ -72,7 +72,7 @@ extern void bot_move_right();
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me(). */
-extern int bot_split_up(int energy) __z88dk_fastcall;
+extern unsigned int bot_split_up(unsigned int energy) __z88dk_fastcall;
 
 /* Make a clone of myself in the cell down.
  * Blocks until cloning is complete.
@@ -84,7 +84,7 @@ extern int bot_split_up(int energy) __z88dk_fastcall;
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me(). */
-extern int bot_split_down(int energy) __z88dk_fastcall;
+extern unsigned int bot_split_down(unsigned int energy) __z88dk_fastcall;
 
 /* Make a clone of myself in the cell left.
  * Blocks until cloning is complete.
@@ -96,7 +96,7 @@ extern int bot_split_down(int energy) __z88dk_fastcall;
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me().*/
-extern int bot_split_left(int energy) __z88dk_fastcall;
+extern unsigned int bot_split_left(unsigned int energy) __z88dk_fastcall;
 
 /* Make a clone of myself in the cell right.
  * Blocks until cloning is complete.
@@ -108,7 +108,7 @@ extern int bot_split_left(int energy) __z88dk_fastcall;
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me(). */
-extern int bot_split_right(int energy) __z88dk_fastcall;
+extern unsigned int bot_split_right(unsigned int energy) __z88dk_fastcall;
 
 /* Performs surrounding scan. Variable scan is modified.
  * Blocks until scanning is complete.

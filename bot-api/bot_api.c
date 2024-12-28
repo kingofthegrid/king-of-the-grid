@@ -120,7 +120,7 @@ unsigned int bot_get_seed()
 #endif
 }
 
-int bot_split_up(int energy) __z88dk_fastcall
+unsigned int bot_split_up(unsigned int energy) __z88dk_fastcall
 {
 #ifndef __IDE__
 #asm
@@ -130,7 +130,7 @@ int bot_split_up(int energy) __z88dk_fastcall
 #endif
 }
 
-int bot_split_down(int energy) __z88dk_fastcall
+unsigned int bot_split_down(unsigned int energy) __z88dk_fastcall
 {
 #ifndef __IDE__
 #asm
@@ -140,7 +140,7 @@ int bot_split_down(int energy) __z88dk_fastcall
 #endif
 }
 
-int bot_split_left(int energy) __z88dk_fastcall
+unsigned int bot_split_left(unsigned int energy) __z88dk_fastcall
 {
 #ifndef __IDE__
 #asm
@@ -150,7 +150,7 @@ int bot_split_left(int energy) __z88dk_fastcall
 #endif
 }
 
-int bot_split_right(int energy) __z88dk_fastcall
+unsigned int bot_split_right(unsigned int energy) __z88dk_fastcall
 {
 #ifndef __IDE__
 #asm
@@ -170,7 +170,7 @@ void bot_scan(struct scan_t* scan) __z88dk_fastcall
 #endif
 }
 
-void bot_hibernate(struct scan_t* scan) __z88dk_fastcall
+void bot_hibernate() __z88dk_fastcall
 {
 #ifndef __IDE__
 #asm

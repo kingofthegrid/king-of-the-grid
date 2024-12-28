@@ -337,7 +337,7 @@ int main(int argc, char** argv)
         {
             std::stringstream outcome;
 
-            outcome << "[";
+            outcome << "{\"seed\": " << master_seed_v << ", \"results\": [";
 
             std::vector<CPUProgram*> sorted_programs;
 
@@ -366,7 +366,6 @@ int main(int argc, char** argv)
                 }
 
                 outcome << "{" << std::endl;
-                outcome << "    \"seed\": " << master_seed_v << "," << std::endl;
                 outcome << "    \"bot\": \"" << p->get_name() << "\"," << std::endl;
                 outcome << "    \"score\": " << p->get_score() << "," << std::endl;
                 outcome << "    \"wins\": [";
@@ -389,7 +388,7 @@ int main(int argc, char** argv)
                 outcome << "}";
             }
 
-            outcome << "]" << std::endl;
+            outcome << "]}" << std::endl;
 
             std::cout << outcome.str();
 

@@ -86,7 +86,7 @@ html_content = f"""
 """
 
 # Generate table rows from the JSON data
-for index, entry in enumerate(data):
+for index, entry in enumerate(data["results"]):
     bot_name = entry["bot"]
     score = entry["score"]
     wins = entry["wins"]

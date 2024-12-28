@@ -54,7 +54,7 @@ int WorldRules::food_spawn_energy_with
 
 /* Amount of ticks food loses 1 energy point */
 int WorldRules::food_decay_rate
-    = 500;
+    = 50;
 
 /* When food is eaten, bot receives energy * multiplier */
 int WorldRules::food_energy_multiplier

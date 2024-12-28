@@ -85,7 +85,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
 
     if (world->get_recording())
     {
-        world->get_recording()->event("Playing: " + program1.get_name() + "(" + BOT_1 + ") vs " + program2.get_name() + "(" + BOT_2 + ")");
+        world->get_recording()->event("Playing: " + program1.get_name() + "() vs " + program2.get_name() + "()");
     }
 
     while (world->is_running())
@@ -232,7 +232,24 @@ int main(int argc, char** argv)
             throw std::runtime_error("Server runtime needs at least two runtimes.");
         }
 
-        srand(time(0));
+        unsigned long master_seed_v;
+
+        if (getenv("MASS_SEED"))
+        {
+            master_seed_v = atol(getenv("MASS_SEED"));
+        }
+        else
+        {
+            master_seed_v = time(0);
+        }
+
+        std::cout << "Using master (mass) seed: " << master_seed_v << " define MASS_SEED to overwrite" << std::endl;
+        std::mt19937 master_seed(master_seed_v);
+
+        std::function<int(int max)> get_master_random = [&](int max){
+            std::uniform_int_distribution<int> distribution(0, max - 1);
+            return distribution(master_seed);
+        };
 
         std::map<std::string, std::vector<std::string>> wins {};
 
@@ -243,7 +260,7 @@ int main(int argc, char** argv)
             {
                 for (int i = 1; i <= 3; i++)
                 {
-                    int seed = rand() & 0xFFFF;
+                    int seed = get_master_random(0xFFFF);
 
                     std::cout << "-------------------" << std::endl;
                     std::cout << " TAKE #" << i << " testing programs " << it1->first << " and " << it2->first << " on seed " << seed << "." << std::endl;
@@ -348,6 +365,7 @@ int main(int argc, char** argv)
                 }
 
                 outcome << "{" << std::endl;
+                outcome << "    \"seed\": " << master_seed_v << "," << std::endl;
                 outcome << "    \"bot\": \"" << p->get_name() << "\"," << std::endl;
                 outcome << "    \"score\": " << p->get_score() << "," << std::endl;
                 outcome << "    \"wins\": [";

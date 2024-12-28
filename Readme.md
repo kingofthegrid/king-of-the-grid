@@ -68,6 +68,9 @@ Run `kotg`
 In this mode, each pair of programs will play against one another twice on the same seed.
 That way both bots have a chance.
 
+This process is deterministic too. You can specify `MASS_SEED` environment variable with seed
+from previous play out and have the process repeated exactly for debugging purposes.
+
 Any game session can be replicated. Given a session outcome AAA BBB 1338, you can just pass these arguments to kotg
 and play the game again.
 

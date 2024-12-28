@@ -39,15 +39,15 @@ std::ostream &operator<<(std::ostream &os, const Progress &c)
 
     if (c.intensity > 0.66)
     {
-        v = "⠇";
+        v = "\\u2807"; // ⠇
     }
     else if (c.intensity > 0.33)
     {
-        v = "⠆";
+        v = "\\u2806"; // ⠆
     }
     else
     {
-        v = "⠄";
+        v = "\\u2804"; // ⠄
     }
 
     return os << RichColor(3, 3, 3) << v;

@@ -121,11 +121,6 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 
 # How to write your Bot
 
-<div align="center">
-  <img src="doc/example-build.gif"/><br/>
-  Example of how to build a bot.
-</div>
-
 * [Download z88dk](https://github.com/z88dk/z88dk/releases) or install z88dk from sources:
   ```bash
   # dependencies on Ubuntu
@@ -148,6 +143,24 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 * See [example bot](./examples/test-bot) for an example on how to build with C and z88dk.
   It uses CMake, but you can build with just zcc: `zcc +test bot_api.c <program>.c -o mybot.bin`
 * If you prefer assembly, see section below.
+
+# How to write your bot without CMake
+
+Have the following `example.c` and copy `bot_api.h` and `bot_api.c` into your folder.
+```c
+#include "bot_api.h"
+#include <stdio.h>
+int main()
+{
+    bot_move_right();
+    bot_move_left();
+}
+```
+
+Then simply do (zorg is important):
+```bash
+zcc +test -zorg=8192 bot_api.c example.c -o example.bin
+```
 
 # I don't like z88dk or C for that matter
 

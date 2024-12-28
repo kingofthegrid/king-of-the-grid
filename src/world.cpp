@@ -72,6 +72,13 @@ void World::simulate(Frontend& frontend)
                 if (cell.state == CellState::food)
                 {
                     cell.m_food_value--;
+
+                    if (cell.m_food_value % (WorldRules::food_spawn_energy_with / 4) == 0)
+                    {
+                        m_recording->new_cell(x_c, y_c, Recording::CELL_FOOD,
+                            (float)cell.m_food_value / (float)WorldRules::food_spawn_energy_with);
+                    }
+
                     if (cell.m_food_value == 0)
                     {
                         cell.set_empty();

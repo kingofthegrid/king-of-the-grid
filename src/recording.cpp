@@ -7,6 +7,52 @@
 #include <sstream>
 #include <iomanip>
 
+std::ostream& operator<< (std::ostream &os, const Color& c)
+{
+    return os << "\\u001b[" << c.color_code << "m";
+}
+
+std::ostream& operator<< (std::ostream &os, const RichColor& c)
+{
+    int color_index = 16 + (36 * std::clamp(c.r, 0, 5)) + (6 * std::clamp(c.g, 0, 5)) + std::clamp(c.b, 0, 5);
+    return os << "\\u001b[38;5;" << color_index << "m";
+}
+
+std::ostream& operator<< (std::ostream &os, const Position& c)
+{
+    return os << "\\u001b[" << c.y << ";" << c.x << "H";
+}
+
+std::ostream& operator<< (std::ostream &os, const RecordingLineBegin& c)
+{
+    return os << "[" << c.timestamp << ", \"o\", \"";
+}
+
+std::ostream& operator<< (std::ostream &os, const RecordingLineEnd& c)
+{
+    return os << "\"]" << std::endl;
+}
+
+std::ostream &operator<<(std::ostream &os, const Progress &c)
+{
+    const char* v;
+
+    if (c.intensity > 0.66)
+    {
+        v = "⠇";
+    }
+    else if (c.intensity > 0.33)
+    {
+        v = "⠆";
+    }
+    else
+    {
+        v = "⠄";
+    }
+
+    return os << RichColor(3, 3, 3) << v;
+}
+
 Recording::Recording(World& world, const std::string& name, const std::string& title) :
     m_name(name),
     m_title(title),
@@ -17,7 +63,7 @@ Recording::Recording(World& world, const std::string& name, const std::string& t
 {
     std::cout << "Recording enabled: " << name << std::endl;
 
-    int console_width = (WorldRules::world_width * RECORDING_SIZE_X_MP) + RECORDING_OFFSET_X + RECORDING_STDOUT_WIDTH + 2;
+    int console_width = (WorldRules::world_width * RECORDING_SIZE_X_MP) + RECORDING_OFFSET_X + RECORDING_STDOUT_WIDTH + 5;
     int console_height = (WorldRules::world_height * RECORDING_SIZE_Y_MP) + RECORDING_OFFSET_Y;
 
     m_stream << "{\"version\": 2, \"width\": " << console_width <<
@@ -30,32 +76,33 @@ Recording::Recording(World& world, const std::string& name, const std::string& t
     m_stream << "[" << timestamp() << ", \"o\", \"\\u001b[H\\u001b[J\"]" << std::endl;
 
     {
-        {
-            std::stringstream top;
-            top << "+" << std::string((WorldRules::world_width * RECORDING_SIZE_X_MP), '-') << "+";
-            log(RECORDING_OFFSET_X - 1, RECORDING_OFFSET_Y - 1, top.str(), 37);
+        RECORD(Position(RECORDING_STDOUT_WIDTH + 1, RECORDING_OFFSET_Y - 1) << RichColor(1, 1, 1) <<
+            "+" << std::string((WorldRules::world_width * RECORDING_SIZE_X_MP), '-') << "+");
+
+        std::stringstream ss;
+
+        ss << "|";
+
+        for (int i = 0; i < WorldRules::world_width; ++i) {
+            ss << EMPTY_SPACE;
         }
+
+        ss << "|";
 
         for (int i = 0; i < WorldRules::world_height; ++i) {
-            std::stringstream row;
-            row << "|" << std::string(WorldRules::world_width * RECORDING_SIZE_X_MP, ' ') << "|";
-            log(RECORDING_OFFSET_X - 1, RECORDING_OFFSET_Y + i, row.str(), 37);
+            RECORD(Position(RECORDING_STDOUT_WIDTH + 1, RECORDING_OFFSET_Y + i) << RichColor(1, 1, 1) <<
+                ss.str());
         }
 
-        {
-            std::stringstream bottom;
-            bottom << "+" << std::string(WorldRules::world_width * RECORDING_SIZE_X_MP, '-') << "+";
-            log(RECORDING_OFFSET_X - 1, RECORDING_OFFSET_Y + WorldRules::world_height, bottom.str(), 37);
-        }
+        RECORD(Position(RECORDING_STDOUT_WIDTH + 1, RECORDING_OFFSET_Y + WorldRules::world_height) << RichColor(1, 1, 1) <<
+            "+" << std::string((WorldRules::world_width * RECORDING_SIZE_X_MP), '-') << "+");
     }
 }
 
 void Recording::start()
 {
-    log(RECORDING_OFFSET_X + WorldRules::world_width * RECORDING_SIZE_X_MP + 2,
-        RECORDING_OFFSET_Y - 1, get_stdout(0).name + ":", 37);
-    log(RECORDING_OFFSET_X + WorldRules::world_width * RECORDING_SIZE_X_MP + 2,
-        RECORDING_OFFSET_Y + (WorldRules::world_height / 2) - 1, get_stdout(1).name + ":", 37);
+    log(0, RECORDING_OFFSET_Y - 1, get_stdout(0).name + ":", 37);
+    log(0, RECORDING_OFFSET_Y + (WorldRules::world_height / 2) - 1, get_stdout(1).name + ":", 37);
 }
 
 Recording::~Recording()
@@ -109,8 +156,7 @@ void Recording::add_stdout(int index, const std::string& v)
 
     for (int i = 0; i < RECORDING_STDOUT; i++)
     {
-        log(RECORDING_OFFSET_X + WorldRules::world_width * RECORDING_SIZE_X_MP + 2,
-            RECORDING_OFFSET_Y + offset_y + i, o.log[i], 36);
+        log(0, RECORDING_OFFSET_Y + offset_y + i, o.log[i], 36);
     }
 }
 
@@ -121,79 +167,51 @@ float Recording::timestamp()
 
 void Recording::log(int x, int y, const std::string& v, int color)
 {
-    m_stream << "[" << timestamp() << ", \"o\", \"" <<
-        "\\u001b[" << y << ";" << x<< "H"
-        << "\\u001b[" << color << "m"
-        << v
-        << "\"]" << std::endl;
+    RECORD(Position(x, y) << Color(color) << v);
 }
 
 void Recording::log_ext(int x, int y, const std::string& v, int r, int g, int b)
 {
-    int color_index = 16 + (36 * std::clamp(r, 0, 5)) + (6 * std::clamp(g, 0, 5)) + std::clamp(b, 0, 5);
-
-    m_stream << "[" << timestamp() << ", \"o\", \"" <<
-        "\\u001b[" << y << ";" << x<< "H"
-        << "\\u001b[38;5;" << color_index << "m"
-        << v
-        << "\"]" << std::endl;
+    RECORD(Position(x, y) << RichColor(r, g, b) << v);
 }
 
 void Recording::new_cell(int x, int y, int index, float intensity)
 {
-    const char* v;
-
     intensity = std::clamp(intensity, 0.f, 1.0f);
 
-    int r;
-    int g;
-    int b;
+    int xx = RECORDING_STDOUT_WIDTH + x * RECORDING_SIZE_X_MP + RECORDING_OFFSET_X;
+    int yy = y * RECORDING_SIZE_Y_MP + RECORDING_OFFSET_Y;
 
     switch (index)
     {
         case CELL_FOOD:
         {
-            v = "<%>";
-            r = 2;
-            g = 2;
-            b = 2;
+            RECORD(Position(xx, yy) << RichColor(5, 4, 0) << " ✿" << Progress(intensity));
             break;
         }
         case CELL_PREY:
         {
-            v = "(~)";
-            r = 5;
-            g = 5;
-            b = 5;
+            RECORD(Position(xx, yy) << RichColor(0, 5, 0) << " ⏺" << Progress(intensity));
             break;
         }
         case CELL_BOT_A:
         {
-            v = "{1}";
-
-            r = 5 - int(intensity * 5);
-            g = int(intensity * 5);
-            b = 0;
+            RECORD(Position(xx, yy) << RichColor(5, 2, 0) << " " << BOT_1 << Progress(intensity));
 
             break;
         }
         case CELL_BOT_B:
         default:
         {
-            v = "{2}";
-
-            r = 5 - int(intensity * 5);
-            g = int(intensity * 5);
-            b = 0;
-
+            RECORD(Position(xx, yy) << RichColor(0, 2, 5) << " " << BOT_2 << Progress(intensity));
             break;
         }
     }
-
-    log_ext(x * RECORDING_SIZE_X_MP + RECORDING_OFFSET_X, y * RECORDING_SIZE_Y_MP + RECORDING_OFFSET_Y, v, r, g, b);
 }
 
 void Recording::cell_removed(int x, int y)
 {
-    log(x * RECORDING_SIZE_X_MP + RECORDING_OFFSET_X, y * RECORDING_SIZE_Y_MP + RECORDING_OFFSET_Y, "   ", 30);
+    RECORD(Position(RECORDING_STDOUT_WIDTH + x * RECORDING_SIZE_X_MP +
+        RECORDING_OFFSET_X, y * RECORDING_SIZE_Y_MP + RECORDING_OFFSET_Y) <<
+        EMPTY_SPACE);
 }

@@ -17,6 +17,10 @@
 #define RECORDING_OFFSET_X (2)
 #define RECORDING_STDOUT_WIDTH (32)
 
+#define BOT_1 "▲"
+#define BOT_2 "◆"
+#define EMPTY_SPACE "   "
+
 class World;
 
 struct RecordingSTDOut
@@ -24,6 +28,62 @@ struct RecordingSTDOut
     std::string name;
     std::array<std::string, RECORDING_STDOUT> log;
 };
+
+class Color
+{
+public:
+    explicit Color(int color_code) : color_code(color_code) {}
+    friend std::ostream &operator<<(std::ostream &os, const Color &c);
+private:
+    int color_code;
+};
+
+class Progress
+{
+public:
+    explicit Progress(float intensity) : intensity(intensity) {}
+    friend std::ostream &operator<<(std::ostream &os, const Progress &c);
+private:
+    float intensity;
+};
+
+class RichColor
+{
+public:
+    explicit RichColor(int r, int g, int b) : r(r), g(g), b(b) {}
+    friend std::ostream &operator<<(std::ostream &os, const RichColor &c);
+private:
+    int r;
+    int g;
+    int b;
+};
+
+class Position
+{
+public:
+    explicit Position(int x, int y) : x(x), y(y) {}
+    friend std::ostream &operator<<(std::ostream &os, const Position &c);
+private:
+    int x;
+    int y;
+};
+
+class RecordingLineBegin
+{
+public:
+    explicit RecordingLineBegin(float timestamp) : timestamp(timestamp) {}
+    friend std::ostream &operator<<(std::ostream &os, const RecordingLineBegin &c);
+private:
+    float timestamp;
+};
+
+class RecordingLineEnd
+{
+public:
+    friend std::ostream &operator<<(std::ostream &os, const RecordingLineEnd &c);
+};
+
+#define RECORD(x) m_stream << RecordingLineBegin(timestamp()) << x << RecordingLineEnd()
 
 class Recording
 {

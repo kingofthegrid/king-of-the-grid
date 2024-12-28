@@ -49,8 +49,8 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
     long limit = 0;
     std::unique_ptr<World> world = std::make_unique<World>(seed);
 
-    std::string title = "King-Of-The-Grid | " + program1.get_name() + " vs " +
-        program2.get_name() + " seed " + std::to_string(seed);
+    std::string title = "King-Of-The-Grid | " + program1.get_name() + "(" + BOT_1 + ") vs " +
+        program2.get_name() + "(" + BOT_2 + ") seed " + std::to_string(seed);
 
     if (simple_name)
     {
@@ -85,7 +85,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
 
     if (world->get_recording())
     {
-        world->get_recording()->event("Playing: " + program1.get_name() + " vs " + program2.get_name());
+        world->get_recording()->event("Playing: " + program1.get_name() + "(" + BOT_1 + ") vs " + program2.get_name() + "(" + BOT_2 + ")");
     }
 
     while (world->is_running())
@@ -104,7 +104,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
         {
             if (world->get_recording())
             {
-                world->get_recording()->event(">>>>>>>>>>>> Program " + program2.get_name() + " (2) won.");
+                world->get_recording()->event(">>>>>>>>>>>> Program " + program2.get_name() + " " + BOT_2 + " won.");
             }
             result = 2;
             world->stop();
@@ -113,7 +113,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
         {
             if (world->get_recording())
             {
-                world->get_recording()->event(">>>>>>>>>>>> Program " + program1.get_name() + " (1) won.");
+                world->get_recording()->event(">>>>>>>>>>>> Program " + program1.get_name() + " " + BOT_1 + " won.");
             }
             result = 1;
             world->stop();
@@ -149,12 +149,12 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
     {
         case 1:
         {
-            std::cout << "    Program " << program1.get_name() << " (1) won." << std::endl;
+            std::cout << "    Program " << program1.get_name() << " " << BOT_1 << " won." << std::endl;
             break;
         }
         case 2:
         {
-            std::cout << "    Program " << program2.get_name() << " (2) won." << std::endl;
+            std::cout << "    Program " << program2.get_name() << " " << BOT_2 << " won." << std::endl;
             break;
         }
         case 0:
@@ -259,14 +259,14 @@ int main(int argc, char** argv)
                             {
                                 it1->second.bump_score();
                                 wins[it1->first].push_back("recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt");
-                                std::cout << "A: Program " << it1->first << " (1) won." << std::endl;
+                                std::cout << "A: Program " << it1->first << " " << BOT_1 << " won." << std::endl;
                                 break;
                             }
                             case 2:
                             {
                                 it2->second.bump_score();
                                 wins[it2->first].push_back("recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt");
-                                std::cout << "A: Program " << it2->first << " (2) won." << std::endl;
+                                std::cout << "A: Program " << it2->first << " " << BOT_2 << " won." << std::endl;
                                 break;
                             }
                             case 0:
@@ -290,14 +290,14 @@ int main(int argc, char** argv)
                             {
                                 it2->second.bump_score();
                                 wins[it2->first].push_back("recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt");
-                                std::cout << "B: Program " << it2->first << " (2) won." << std::endl;
+                                std::cout << "B: Program " << it2->first << " " << BOT_2 << " won." << std::endl;
                                 break;
                             }
                             case 2:
                             {
                                 it1->second.bump_score();
                                 wins[it1->first].push_back("recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt");
-                                std::cout << "B: Program " << it1->first << " (1) won." << std::endl;
+                                std::cout << "B: Program " << it1->first << " " << BOT_1 << " won." << std::endl;
                                 break;
                             }
                             case 0:

@@ -4,7 +4,9 @@
 bots to compete on the most efficient algorithm to be King Of The Grid!
 
 <div align="center">
-  <img src="doc/game.gif" width="500"/><br/>
+
+https://github.com/user-attachments/assets/10258c56-2554-46ed-8e49-46176c138275
+  
   Example of a single competition.
 </div>
 

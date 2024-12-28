@@ -11,6 +11,7 @@ PREFIX_PATH = sys.argv[3]
 with open(OUTCOMES_JSON, "r") as file:
     data = json.load(file)
 
+seed = data["seed"]
 date_s = str(datetime.now())
 
 # Generate the HTML content
@@ -65,7 +66,7 @@ html_content = f"""
         </div>
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#leaderboard">Leaderboard</a>
+                <a class="nav-link active" data-toggle="tab" href="#leaderboard">Leaderboard ({date_s}) seed ({seed})</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#rules">Game Rules</a>

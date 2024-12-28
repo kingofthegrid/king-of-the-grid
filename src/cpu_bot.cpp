@@ -417,6 +417,11 @@ void CPUBot::scan(struct scan_t* scan)
 
 int CPUBot::split(int x, int y, int energy)
 {
+    if (energy == 0)
+    {
+        return 0;
+    }
+
     if (energy >= get_energy())
     {
         move(x, y);

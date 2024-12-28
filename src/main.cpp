@@ -12,6 +12,7 @@
 #include "server_frontend.h"
 #include "cpu_bot.h"
 #include "rules.h"
+#include <functional>
 
 using namespace std::chrono;
 

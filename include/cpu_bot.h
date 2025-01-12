@@ -29,7 +29,7 @@ public:
 
 private:
     std::string m_name;
-    uint8_t m_program[TOTAL_MEM_SIZE - SHARED_MEM_SIZE];
+    uint8_t m_program[TOTAL_MEM_SIZE];
     uint8_t m_shared_ram[SHARED_MEM_SIZE];
     int m_count;
     bool m_first;
@@ -65,11 +65,15 @@ public:
     int get_bot_type() const override;
     int get_seed() const { return m_seed; }
 
+    bool is_shared_memory_enabled() const { return m_shared_memory_enabled; }
+    void enable_shared_memory() { m_shared_memory_enabled = true; }
+
 private:
     CPUProgram& m_program;
     Z80 m_cpu;
     uint8_t m_private_memory[TOTAL_MEM_SIZE];
     std::stringstream m_stdout;
     std::stringstream m_stdout_total;
+    bool m_shared_memory_enabled;
     int m_seed;
 };

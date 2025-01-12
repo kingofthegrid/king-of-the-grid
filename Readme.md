@@ -38,15 +38,15 @@ python3 -m http.server 8000
 # Open http://localhost:8000/kotg.html in browser
 ```
 
-# How to build the game in command line
+# How to build the game engine in command line
 
 * Have `cmake` and `gcc` installed.
 * `git submodule update --init --recursive`
 * Do `make`
-* To test an [example bot](./examples/test-bot) do `make testbot`. This example
+* To test an [example bot](./examples/test-bot-z88dk) do `make testbot`. This example
   runs the bot against itself.
 
-# How to run
+# How to run game engine
 
 ## Single session:
 
@@ -54,12 +54,18 @@ Go into folder with two (or one) of your programs, they must have `.bin` extensi
 
 Run: `kotg <program1> [<program2>] [<seed>]`.
 
+### Watching the results
+
 Game outputs files `recording-xxx.txt`, which you can play with [asciinema](https://asciinema.org/):
+
 ```bash
 asciinema play recording-xxx.txt
 # or, to share the game on the web
 asciinema upload recording-xxx.txt
 ```
+
+Export `KOTG_AUTOPLAY=1` to play results automatically.
+Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 
 ## Mass session:
 
@@ -82,17 +88,6 @@ Every game is deterministic: given two programs and a seed, it will play out exa
 That way, when you loose in a mass session, you can replicate the session with your target in order to 
 adjust to your opponent's behavior.
 
-# Watching the results
-
-Game outputs files `<a>-<b>-<seed>.txt` which you can play using [asciinema.org](https://asciinema.org/):
-
-```bash
-asciinema play <a>-<b>-<seed>.txt
-```
-
-Export `KOTG_AUTOPLAY=1` to play results automatically.
-Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
-
 # CPUs
 
 * Each bot runs on a Z80-equipped virtual machine, with limited Z80-ticks per game tick. So if your bot thinks a lot,
@@ -101,27 +96,61 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
 * `printf` is supported for debugging.
 * Each action consumes energy.
 * When bot decides to take action, execution stops until action is done.
-* Program address starts at address 8192, and program can be of size of up to 65536-8192=57344
-* First 8192 (0x0000 - 0x1FFF) of memory are SHARED across all bots. That way they can communicate.
+* Program address starts at address 0, and program can be of size of up to 65536
+* Last 8192 (0xE000 - 0xFFFF) of memory are potentially SHARED across all bots, if enabled. 
+  That way they can communicate.
 * Bots can clone (or fork) themselves in order to spread, fork-bomb style, or hibernate to preserve energy.
+
+# Shared Memory
+
+By default, bots do not have shared memory between themselves, e.g. every instance has 0x0000 - 0xFFFF memory all
+to itself. If bot calls `bot_enable_shared_memory()`, last 8192 bytes (0xE000 - 0xFFFF) of its memory becomes sharable. 
+
+1. Any write to addresses 0xE000 - 0xFFFF will be stored for all bots that have enabled shared memory. 
+2. Any read will return shareable memory – potentially written by other instances of a bot.
+
+Keep in mind, that
+
+1. When shared memory is enabled, "local" memory region 0xE000 - 0xFFFF is lost, therefore shared memory shall
+   be enabled as soon as possible.
+2. If your stack pointer (SP) is located in that region – which is typically default – you will see unexpected
+   issues, therefore take care to set SP to 0xE000 on init. On z88dk, this is done using
+   "-pragma-define=REGISTER_SP=57344", on sdcc you will need to have a custom crt0. (which sdcc-backend does).
+3. By default, shared memory is initialized with zeros.
 
 <table>
 <tr>
 <th>Memory Region</th>
-<th>Description</th>
+<th>Description, when shared memory is enabled.</th>
 </tr>
 <tr>
-<td>0x0000 - 0x1FFF</td>
-<td>Shared memory across all friendly bots
+<td>0x0000 - 0xDFFF</td>
+<td>Program memory (including stack)</td>
 <tr>
-<td>0x2000 - 0xFFFF</td>
-<td>Program memory</td>
+<td>0xE000 - 0xFFFF</td>
+<td>Shared memory across all friendly bots
 </tr>
 </table>
 
 # How to write your Bot
 
+## SDCC
+
+* Install sdcc (Mac: `brew install sdcc` Ubuntu: `sudo apt install sdcc` Windows: [here](https://sdcc.sourceforge.net/snap.php#Windows))
+* Include `bot_api.h` and `sdcc-backend.asm` from [bot-api](bot-api) folder in your project.
+* See [example bot](./examples/test-bot-sdcc) for an example on how to build with SDCC.
+* Do `make`, or run the following script:
+
+  ```bash
+  sdasz80 -o sdcc-backend.rel sdcc-backend.asm
+  sdcc -mz80 --no-std-crt0 test_bot.c sdcc-backend.rel -o test-bot-sdcc.ihx
+  objcopy --input-target=ihex --output-target=binary test-bot-sdcc.ihx test-bot-sdcc.bin
+  ```
+
+## Z88DK
+
 * [Download z88dk](https://github.com/z88dk/z88dk/releases) or install z88dk from sources:
+
   ```bash
   # dependencies on Ubuntu
   sudo apt install -y cmake git build-essential libxml2 libxml2-dev m4 perl                                                                           
@@ -139,14 +168,16 @@ Export `KOTG_AUTOUPLOAD=1` to upload them automatically with a review URL.
   ./build.sh -k -p test
   sudo make install
   ```
-* Include `bot_api.h` and `bot_api.c` from [bot-api](bot-api) folder in your project.
-* See [example bot](./examples/test-bot) for an example on how to build with C and z88dk.
-  It uses CMake, but you can build with just zcc: `zcc +test bot_api.c <program>.c -o mybot.bin`
+  
+* Include `bot_api.h` and `z88dk-backend.asm` from [bot-api](bot-api) folder in your project.
+* See [example bot](./examples/test-bot-z88dk) for an example on how to build with C and z88dk.
+  It uses CMake, but you can build with just zcc: `zcc +test z88dk-backend.asm <program>.c -o mybot.bin`
 * If you prefer assembly, see section below.
 
-# How to write your bot without CMake
+### How to write your bot without CMake
 
-Have the following `example.c` and copy `bot_api.h` and `bot_api.c` into your folder.
+Have the following `example.c` and copy `bot_api.h` and `z88dk-backend.asm` into your folder.
+
 ```c
 #include "bot_api.h"
 #include <stdio.h>
@@ -157,18 +188,18 @@ int main()
 }
 ```
 
-Then simply do (zorg is important):
+Then simply do:
 ```bash
-zcc +test -zorg=8192 bot_api.c example.c -o example.bin
+zcc +test z88dk-backend.asm test_bot.c -o example.bin
 ```
 
 # I don't like z88dk or C for that matter
 
-* Make sure your code has base address (`.ORG`) of 8192.
+* Make sure your code has base address (`.ORG`) of 0.
 * For communication, see below.
 * Other than that, your bot can do whatever!
 
-See [bot_api.c](bot-api/bot_api.c) on how bot interacts with the world.
+See [z88dk-backend.asm](bot-api/z88dk-backend.asm) on how bot interacts with the world.
 
 To call a system call, load call number into register a `A` and them do
 

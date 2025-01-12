@@ -3,8 +3,10 @@
 
 /* C API for bots */
 
-#ifdef __JETBRAINS_IDE__
-#define __z88dk_fastcall
+#ifdef __SDCC
+#define CALLAPI
+#else
+#define CALLAPI __z88dk_fastcall
 #endif
 
 // Scanning area size (square), always odd
@@ -28,39 +30,39 @@ struct scan_t
 };
 
 /* get current bot's X coordinate. */
-extern char bot_get_x();
+extern char bot_get_x(void) CALLAPI;
 
 /* get current bot's Y coordinate. */
-extern char bot_get_y();
+extern char bot_get_y(void) CALLAPI;
 
 /* get current bot's ID. */
-extern unsigned int bot_get_me();
+extern unsigned int bot_get_me(void) CALLAPI;
 
 /* get current bot's remaining energy value. */
-extern unsigned int bot_get_energy();
+extern unsigned int bot_get_energy(void) CALLAPI;
 
 /* get current seed (randomness). */
-extern unsigned int bot_get_seed();
+extern unsigned int bot_get_seed(void) CALLAPI;
 
 /* Move bot up.
  * Blocks the execution until the bot has completed the movement.
  * Takes some energy. */
-extern void bot_move_up();
+extern void bot_move_up(void) CALLAPI;
 
 /* Move bot down.
  * Blocks the execution until the bot has completed the movement.
  * Takes some energy. */
-extern void bot_move_down();
+extern void bot_move_down(void) CALLAPI;
 
 /* Move bot left.
  * Blocks the execution until the bot has completed the movement.
  * Takes some energy. */
-extern void bot_move_left();
+extern void bot_move_left(void) CALLAPI;
 
 /* Move bot right.
  * Blocks the execution until the bot has completed the movement.
  * Takes some energy. */
-extern void bot_move_right();
+extern void bot_move_right(void) CALLAPI;
 
 /* Make a clone of myself in the cell up.
  * Blocks until cloning is complete.
@@ -72,7 +74,7 @@ extern void bot_move_right();
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me(). */
-extern unsigned int bot_split_up(unsigned int energy) __z88dk_fastcall;
+extern unsigned int bot_split_up(unsigned int energy) CALLAPI;
 
 /* Make a clone of myself in the cell down.
  * Blocks until cloning is complete.
@@ -84,7 +86,7 @@ extern unsigned int bot_split_up(unsigned int energy) __z88dk_fastcall;
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me(). */
-extern unsigned int bot_split_down(unsigned int energy) __z88dk_fastcall;
+extern unsigned int bot_split_down(unsigned int energy) CALLAPI;
 
 /* Make a clone of myself in the cell left.
  * Blocks until cloning is complete.
@@ -96,7 +98,7 @@ extern unsigned int bot_split_down(unsigned int energy) __z88dk_fastcall;
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me().*/
-extern unsigned int bot_split_left(unsigned int energy) __z88dk_fastcall;
+extern unsigned int bot_split_left(unsigned int energy) CALLAPI;
 
 /* Make a clone of myself in the cell right.
  * Blocks until cloning is complete.
@@ -108,14 +110,29 @@ extern unsigned int bot_split_left(unsigned int energy) __z88dk_fastcall;
  * Please note that this function behaves like fork() in linux: both bots continue from the same location, saving all
  * context. You can check if you're in the cloners execution space or in the clonee by checking the return ID against
  * bot_get_me(). */
-extern unsigned int bot_split_right(unsigned int energy) __z88dk_fastcall;
+extern unsigned int bot_split_right(unsigned int energy) CALLAPI;
 
 /* Performs surrounding scan. Variable scan is modified.
  * Blocks until scanning is complete.
  * Takes some energy. */
-extern void bot_scan(struct scan_t* scan) __z88dk_fastcall;
+extern void bot_scan(struct scan_t* scan) CALLAPI;
 
 /* Sleep for a while to conserve energy. */
-extern void bot_hibernate() __z88dk_fastcall;
+extern void bot_hibernate(void) CALLAPI;
+
+/* By default, bots do not have shared memory between themselves, e.g. every instance has 0x0000 - 0xFFFF memory all
+ * to itself. This call makes the memory area 0xE000 - 0xFFFF shareable.
+ * 1) Any write to addresses 0xE000 - 0xFFFF will be stored for all bots that have enabled shared memory.
+ * 2) Any read will return shareable memory – potentially written by other instances of a bot.
+ *
+ * Keep in mind, that
+ * a) when shared memory is enabled, "local" memory region 0xE000 - 0xFFFF is lost, therefore shared memory shall
+ *    be enabled as soon as possible.
+ * b) if your stack pointer (SP) is located in that region – which is typically default – you will see unexpected
+ *    issues, therefore take care to set SP to 0xE000 on init. On z88dk, this is done using
+ *    "-pragma-define=REGISTER_SP=57344", on sdcc you will need to have a custom crt0. (which sdcc-backend does).
+ *
+ * By default, shared memory is initialized with zeros. */
+extern char bot_enable_shared_memory(void) CALLAPI;
 
 #endif

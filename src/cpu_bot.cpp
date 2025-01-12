@@ -36,9 +36,9 @@ static zuint8 z80_memory_read(void *context, zuint16 address)
 {
     auto* computer = (CPUBot*)context;
 
-    if (address < SHARED_MEM_SIZE)
+    if (computer->is_shared_memory_enabled() && (address >= SHARED_MEM_LOCATION))
     {
-        return computer->get_shared_memory()[address];
+        return computer->get_shared_memory()[address - SHARED_MEM_LOCATION];
     }
     else
     {
@@ -83,6 +83,7 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                     auto* computer = (CPUBot*)cpu->context;
                     int id = computer->split(0, -1, Z80_HL(*cpu));
                     Z80_HL(*cpu) = id;
+                    Z80_DE(*cpu) = id;
                     z80_break(cpu);
                     break;
                 }
@@ -91,6 +92,7 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                     auto* computer = (CPUBot*)cpu->context;
                     int id = computer->split(0, 1, Z80_HL(*cpu));;
                     Z80_HL(*cpu) = id;
+                    Z80_DE(*cpu) = id;
                     z80_break(cpu);
                     break;
                 }
@@ -99,6 +101,7 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                     auto* computer = (CPUBot*)cpu->context;
                     int id = computer->split(-1, 0, Z80_HL(*cpu));;
                     Z80_HL(*cpu) = id;
+                    Z80_DE(*cpu) = id;
                     z80_break(cpu);
                     break;
                 }
@@ -107,6 +110,7 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                     auto* computer = (CPUBot*)cpu->context;
                     int id = computer->split(1, 0, Z80_HL(*cpu));;
                     Z80_HL(*cpu) = id;
+                    Z80_DE(*cpu) = id;
                     z80_break(cpu);
                     break;
                 }
@@ -152,30 +156,41 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                 {
                     auto* computer = (CPUBot*)cpu->context;
                     Z80_HL(*cpu) = computer->get_x();
+                    Z80_DE(*cpu) = computer->get_x();
                     break;
                 }
                 case CMD_GET_Y:
                 {
                     auto* computer = (CPUBot*)cpu->context;
                     Z80_HL(*cpu) = computer->get_y();
+                    Z80_DE(*cpu) = computer->get_y();
                     break;
                 }
                 case CMD_GET_ME:
                 {
                     auto* computer = (CPUBot*)cpu->context;
                     Z80_HL(*cpu) = computer->get_id();
+                    Z80_DE(*cpu) = computer->get_id();
                     break;
                 }
                 case CMD_GET_ENERGY:
                 {
                     auto* computer = (CPUBot*)cpu->context;
                     Z80_HL(*cpu) = computer->get_energy();
+                    Z80_DE(*cpu) = computer->get_energy();
                     break;
                 }
                 case CMD_GET_SEED:
                 {
                     auto* computer = (CPUBot*)cpu->context;
                     Z80_HL(*cpu) = computer->get_seed();
+                    Z80_DE(*cpu) = computer->get_seed();
+                    break;
+                }
+                case CMD_ENABLE_SHARED_MEMORY:
+                {
+                    auto* computer = (CPUBot*)cpu->context;
+                    computer->enable_shared_memory();
                     break;
                 }
                 default:
@@ -206,9 +221,9 @@ static void z80_memory_write(void *context, zuint16 address, zuint8 value)
 {
     auto* computer = (CPUBot*)context;
 
-    if (address < SHARED_MEM_SIZE)
+    if (computer->is_shared_memory_enabled() && (address >= SHARED_MEM_LOCATION))
     {
-        computer->get_shared_memory()[address] = value;
+        computer->get_shared_memory()[address - SHARED_MEM_LOCATION] = value;
     }
     else
     {
@@ -280,11 +295,12 @@ CPUBot::CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int
     m_private_memory {},
     m_stdout(),
     m_stdout_total(),
-    m_seed(world.get_seed())
+    m_seed(world.get_seed()),
+    m_shared_memory_enabled(false)
 {
     m_program.add_count();
 
-    memcpy(m_private_memory + SHARED_MEM_SIZE, program.get_program_memory(), TOTAL_MEM_SIZE - SHARED_MEM_SIZE);
+    memcpy(m_private_memory, program.get_program_memory(), TOTAL_MEM_SIZE);
 
     m_cpu.context = this;
     m_cpu.fetch = z80_memory_fetch;
@@ -301,7 +317,7 @@ CPUBot::CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int
 
     z80_power(&m_cpu, Z_TRUE);
 
-    Z80_PC(m_cpu) = SHARED_MEM_SIZE;
+    Z80_PC(m_cpu) = 0;
 }
 
 CPUBot::~CPUBot()
@@ -451,8 +467,9 @@ int CPUBot::split(int x, int y, int energy)
         new_bot->m_cpu.context = new_bot;
         memcpy(new_bot->m_private_memory, m_private_memory, sizeof(m_private_memory));
 
-        // fix HL for new context
+        // fix HL/DE for new context
         Z80_HL(new_bot->m_cpu) = new_bot->get_id();
+        Z80_DE(new_bot->m_cpu) = new_bot->get_id();
 
         new_bot->set_state(BotState::splitting);
         new_bot->m_move_timer = 0;

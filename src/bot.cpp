@@ -135,13 +135,18 @@ void Bot::move(int x, int y)
             return;
         }
 
-        if (new_cell.m_bot_value->is_enemy(this))
+        auto bot = new_cell.m_bot_value.lock();
+
+        if (bot)
         {
-            eating = new_cell.m_bot_value;
-        }
-        else
-        {
-            return;
+            if (bot->is_enemy(this))
+            {
+                eating = bot.get();
+            }
+            else
+            {
+                return;
+            }
         }
     }
 
@@ -201,7 +206,7 @@ void Bot::move(int x, int y)
 
     m_x = new_x;
     m_y = new_y;
-    new_cell.set_bot(this);
+    new_cell.set_bot(shared_from_this());
 
     if (m_world.get_recording())
     {

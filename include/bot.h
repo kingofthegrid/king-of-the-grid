@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 class World;
 class Frontend;
@@ -14,7 +15,7 @@ enum class BotState
     hibernating
 };
 
-class Bot
+class Bot: public std::enable_shared_from_this<Bot>
 {
 public:
     static int LAST_BOT_ID;

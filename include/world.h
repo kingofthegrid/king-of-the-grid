@@ -20,16 +20,18 @@ enum class CellState
 
 struct Cell
 {
+    Cell() : state(CellState::empty), m_food_value(0), m_bot_value() {}
+
     CellState state;
     int m_food_value;
-    Bot* m_bot_value;
+    std::weak_ptr<Bot> m_bot_value;
 
     bool is_empty() const { return state == CellState::empty; }
     bool is_bot() const { return state == CellState::bot; }
     bool is_food() const { return state == CellState::food; }
 
     void set_empty() {
-        state = CellState::empty; m_food_value = 0; m_bot_value = nullptr;
+        state = CellState::empty; m_food_value = 0; m_bot_value.reset();
     }
     void set_food(int value)
     {
@@ -37,7 +39,7 @@ struct Cell
         m_food_value = value;
     }
 
-    void set_bot(Bot* bot)
+    void set_bot(const std::weak_ptr<Bot>& bot)
     {
         state = CellState::bot;
         m_bot_value = bot;
@@ -61,14 +63,14 @@ public:
     Cell& get_cell(int x, int y);
     const Cell& get_cell(int x, int y) const;
 
-    std::list<std::unique_ptr<Bot>>& get_bots() { return m_bots; }
-    const std::list<std::unique_ptr<Bot>>& get_bots() const { return m_bots; }
+    std::list<std::shared_ptr<Bot>>& get_bots() { return m_bots; }
+    const std::list<std::shared_ptr<Bot>>& get_bots() const { return m_bots; }
 
     void set_cell(int x, int y, Cell&& cell);
     int get_seed() const { return m_seed; }
     int get_random(int min, int max);
 
-    void add_bot(Frontend& frontend, Bot* bot);
+    void add_bot(Frontend& frontend, const std::shared_ptr<Bot>& bot);
     void enable_recording(const std::string& name, const std::string& title);
     void start();
 
@@ -78,7 +80,7 @@ public:
 
 private:
     std::vector<Cell> m_cells;
-    std::list<std::unique_ptr<Bot>> m_bots;
+    std::list<std::shared_ptr<Bot>> m_bots;
     Seasons m_seasons;
 
     bool m_running;

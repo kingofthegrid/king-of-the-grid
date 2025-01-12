@@ -56,7 +56,7 @@ void World::simulate(Frontend& frontend)
             auto &cell = get_cell(x, y);
             if (cell.is_empty())
             {
-                add_bot(frontend, new PreyBot(frontend, *this, x, y, WorldRules::prey_spawn_energy_with));
+                add_bot(frontend, std::make_shared<PreyBot>(frontend, *this, x, y, WorldRules::prey_spawn_energy_with));
             }
         }
     }
@@ -94,7 +94,7 @@ void World::simulate(Frontend& frontend)
         bot->simulate();
     }
 
-    m_bots.remove_if([&](const std::unique_ptr<Bot>& bot) -> bool {
+    m_bots.remove_if([&](const std::shared_ptr<Bot>& bot) -> bool {
         return !bot->is_alive();
     });
 
@@ -124,7 +124,7 @@ int World::get_random(int min, int max) {
     return distribution(m_random_engine);
 }
 
-void World::add_bot(Frontend& frontend, Bot* bot)
+void World::add_bot(Frontend& frontend, const std::shared_ptr<Bot>& bot)
 {
     m_bots.emplace_back(bot);
     bot->m_private_frontend = frontend.on_new_bot(*bot);

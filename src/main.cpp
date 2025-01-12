@@ -69,12 +69,12 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
 
     std::unique_ptr<Frontend> frontend = std::make_unique<ServerFrontend>(*world);
 
-    world->add_bot(*frontend, new CPUBot(
+    world->add_bot(*frontend, std::make_shared<CPUBot>(
         *frontend, program1, *world,
         0, 0,
         WorldRules::bot_energy_spawn));
 
-    world->add_bot(*frontend, new CPUBot(
+    world->add_bot(*frontend, std::make_shared<CPUBot>(
         *frontend, program2, *world,
         WorldRules::world_width - 1,
         WorldRules::world_height - 1,

@@ -412,13 +412,22 @@ void CPUBot::scan(struct scan_t* scan)
             }
             else if (cell.is_bot())
             {
-                if (cell.m_bot_value->is_enemy(this))
+                auto bot = cell.m_bot_value.lock();
+
+                if (bot)
                 {
-                    result = SCAN_ENEMY;
+                    if (bot->is_enemy(this))
+                    {
+                        result = SCAN_ENEMY;
+                    }
+                    else
+                    {
+                        result = SCAN_FRIEND;
+                    }
                 }
                 else
                 {
-                    result = SCAN_FRIEND;
+                    result = SCAN_NOTHING;
                 }
             }
             else
@@ -455,7 +464,7 @@ int CPUBot::split(int x, int y, int energy)
             return 0;
 
         m_energy -= energy;
-        auto* new_bot = new CPUBot(m_frontend, m_program, m_world, new_x, new_y, energy);
+        auto new_bot = std::make_shared<CPUBot>(m_frontend, m_program, m_world, new_x, new_y, energy);
         new_bot->m_source_x = get_x();
         new_bot->m_source_y = get_y();
         m_world.add_bot(m_frontend, new_bot);
@@ -464,7 +473,7 @@ int CPUBot::split(int x, int y, int energy)
         // so when it executes, it gets the same context (PC & etc)
         new_bot->m_cpu = m_cpu;
         // fix context after
-        new_bot->m_cpu.context = new_bot;
+        new_bot->m_cpu.context = new_bot.get();
         memcpy(new_bot->m_private_memory, m_private_memory, sizeof(m_private_memory));
 
         // fix HL/DE for new context

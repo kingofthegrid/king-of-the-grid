@@ -46,7 +46,7 @@ html_content = f"""
 <body>
     <div class="container mt-5">
         <div id="game-header" class="d-flex justify-content-center align-items-center">
-            <div class="card mb-3" style="max-width: 800px;">
+            <div class="card mb-3">
                 <div class="row no-gutters">
                     <div class="col-md-3 text-center align-middle">
                         <img src="kotg.png" width="128px" class="mb-4 mt-4">
@@ -56,9 +56,19 @@ html_content = f"""
                             <h5 class="card-title">King Of The Grid</h5>
                             <p class="card-text">A Sandbox Competition Game in which developers can write bots to compete
                                 on the most efficient algorithm to be King Of The Grid!</p>
-                            <a href="run.html" class="btn btn-outline-info mr-2 mb-2" role="button"><i class="bi bi-robot"></i> Test Bots Live in Browser</a>
-                            <a href="https://github.com/kingofthegrid/bots" class="btn btn-outline-warning mr-2 mb-2" role="button"><i class="bi bi-chat-square-dots-fill"></i> Participate In Competition</a>
-                            <a href="https://github.com/kingofthegrid/king-of-the-grid" class="btn btn-outline-secondary mb-2"><i class="bi bi-github"></i> Source</a>
+                            <p class="card-text">
+                                Process is simple:
+                                <ul>
+                                    <li>Evaluate <a href="https://github.com/kingofthegrid/king-of-the-grid/blob/master/src/rules.cpp">game rules</a></li>
+                                    <li>Write your bot implementation <a href="ide/">in an online IDE</a></li>
+                                    <li>Test your bot against others inside <a href="run.html">the runner</a></li>
+                                    <li>Submit your bot <a href="https://github.com/kingofthegrid/bots">here</a></li>
+                                </ul>
+                            </p>
+                            <a href="ide/" class="btn btn-outline-info mr-2 mb-2" role="button"><i class="bi bi-terminal"></i> Write Your Bot In-Browser</a>
+                            <a href="run.html" class="btn btn-outline-light mr-2 mb-2" role="button"><i class="bi bi-robot"></i> Test Your Bots In-Browser</a>
+                            <a href="https://github.com/kingofthegrid/bots" class="btn btn-outline-warning mr-2 mb-2" role="button"><i class="bi bi-chat-square-dots-fill"></i> Submit Your Bot</a>
+                            <a href="https://github.com/kingofthegrid/king-of-the-grid" class="btn btn-outline-light mb-2"><i class="bi bi-github"></i> Source</a>
                         </div>
                     </div>
                 </div>
@@ -120,11 +130,8 @@ html_content += """
                 </ul>
             </div>
             <div class="tab-pane fade" id="how-to-build">
-                <img src="example-build.gif" width="100%">
-                <div class="alert alert-dismissible alert-secondary mt-3 mb-1">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <a href="https://github.com/kingofthegrid/king-of-the-grid?tab=readme-ov-file#how-to-write-your-bot">See more details here.</a>
-                </div>
+                <a href="ide/" class="btn btn-outline-info mr-2" role="button"><i class="bi bi-terminal"></i> Build your bot in an Online IDE</a>
+                <a href="https://github.com/kingofthegrid/king-of-the-grid?tab=readme-ov-file#how-to-write-your-bot">See more details here.</a>
             </div>
         </div>
     </div>

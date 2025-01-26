@@ -1,6 +1,7 @@
 #include "recording.h"
 #include "world.h"
 #include "rules.h"
+#include "utils.h"
 
 #include <iostream>
 #include <cstring>
@@ -145,7 +146,7 @@ void Recording::add_stdout(int index, const std::string& v)
         o.log[i] = o.log[i - 1];
     }
 
-    o.log[0] = v;
+    o.log[0] = escape_json(v);
 
     if (o.log[0].length() != RECORDING_STDOUT_WIDTH)
     {

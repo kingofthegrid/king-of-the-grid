@@ -27,47 +27,6 @@
 	.org	0x38
 	reti
 
-	.org	0x100
-init:
-	ld	sp, #0xE000
-
-    ;; Initialise globl variables
-	call	_main
-	jp	_exit
-
-	;; Ordering of segments for the linker.
-	.area	_HOME
-	.area	_CODE
-	.area	_INITIALIZER
-	.area   _GSINIT
-	.area   _GSFINAL
-
-	.area	_DATA
-	.area	_INITIALIZED
-	.area	_BSEG
-	.area   _BSS
-	.area   _HEAP
-
-	.area   _CODE
-
-__clock::
-	ld	a,#2
-	rst     0x08
-	ret
-
-_exit::
-	;; Exit - special code to the emulator
-	ld	a,#0
-	.db 0xED, 0xFE
-1$:
-	halt
-	jr	1$
-
-	.area   _GSINIT
-	.area   _GSFINAL
-	ret
-
-
     .globl _bot_move_up
     .globl _bot_move_down
     .globl _bot_move_left
@@ -110,11 +69,13 @@ _bot_move_right:
 _bot_get_x:
     ld a, #104
     .db 0xED, 0xFE
+    ld a, l
     ret
 
 _bot_get_y:
     ld a, #105
     .db 0xED, 0xFE
+    ld a, l
     ret
 
 _bot_get_me:
@@ -171,3 +132,37 @@ _putchar:
     ld a, #1
     .db 0xED, 0xFE
     ret
+
+	.org	0x100
+init:
+	ld	sp, #0xE000
+
+    ;; Initialise globl variables
+	call	_main
+	jp	_exit
+
+	;; Ordering of segments for the linker.
+	.area	_HOME
+	.area	_CODE
+	.area	_INITIALIZER
+	.area   _GSINIT
+	.area   _GSFINAL
+
+	.area	_DATA
+	.area	_INITIALIZED
+	.area	_BSEG
+	.area   _BSS
+	.area   _HEAP
+
+	.area   _CODE
+
+__clock::
+	ld	a,#2
+	rst     0x08
+	ret
+
+_exit::
+1$:
+	ld	a,#0
+	.db 0xED, 0xFE
+	jr	1$

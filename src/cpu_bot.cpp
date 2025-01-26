@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <ctype.h>
+#include "utils.h"
 
 static void z80_retn(void *context);
 static zuint8 z80_nmi_read(void *context, zuint16 address);
@@ -61,6 +63,9 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                 // EXIT
                 case 0:
                 {
+                    auto* computer = (CPUBot*)cpu->context;
+                    computer->kill();
+                    z80_break(cpu);
                     break;
                 }
                 // PRINTCHAR
@@ -343,7 +348,7 @@ CPUBot::~CPUBot()
         {
             std::cout << get_name() << " full stdout:" << std::endl;
             std::cout << "-----------------------------------" << std::endl;
-            std::cout << out;
+            std::cout << escape_str(out);
             std::cout << "-----------------------------------" << std::endl;
         }
     }
@@ -501,8 +506,11 @@ void CPUBot::on_stdout(char c)
     }
     else
     {
-        m_stdout << c;
-        m_stdout_total << c;
+        if (isprint((unsigned char)c))
+        {
+            m_stdout << c;
+            m_stdout_total << c;
+        }
     }
 }
 

@@ -92,6 +92,7 @@ html_content = f"""
                         <th>Bot Name</th>
                         <th>Score</th>
                         <th>Wins</th>
+                        <th>Draws</th>
                     </tr>
 """
 
@@ -100,13 +101,17 @@ for index, entry in enumerate(data["results"]):
     bot_name = entry["bot"]
     score = entry["score"]
     wins = entry["wins"]
-    win_links = "<br/>".join([f'<a href="browser.html#{PREFIX_PATH}{win}" target="_blank">{win}</a>' for win in wins])
+    draws = entry["draws"]
+
+    win_links = ", ".join([f'<a href="browser.html#{PREFIX_PATH}{win}" target="_blank">{idx}</a>' for idx, win in enumerate(wins, 1)])
+    draw_links = ", ".join([f'<a href="browser.html#{PREFIX_PATH}{draw}" target="_blank">{idx}</a>' for idx, draw in enumerate(draws, 1)])
 
     html_content += f"""
                     <tr class="table-dark">
                         <td>{index+1}. {bot_name}</td>
                         <td>{score}</td>
                         <td>{win_links if wins else "No Wins"}</td>
+                        <td>{draw_links if draws else "No Draws"}</td>
                     </tr>
     """
 

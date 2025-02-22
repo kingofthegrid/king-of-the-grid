@@ -26,7 +26,11 @@ https://github.com/user-attachments/assets/2881a106-d6ee-4869-8e0b-37a01a3257bd
 
 # Live demo
 
-See [kingofthegrid.com](https://kingofthegrid.com/run.html)
+See [kingofthegrid.com](https://kingofthegrid.com/run.html).
+
+# Online IDE to participate
+
+Write your own bot in [an online IDE](https://kingofthegrid.com/ide/)!
 
 # Easiest: build and run web version
 
@@ -134,6 +138,12 @@ Keep in mind, that
 </table>
 
 # How to write your Bot
+
+## Simplest - Online IDE
+
+Just use an online in-browser IDE that has all dependencies already: https://kingofthegrid.com/ide/
+
+(it spins up Linux alpine inside of your browser)
 
 ## SDCC
 

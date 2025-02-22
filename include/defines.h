@@ -1,5 +1,7 @@
 #pragma once
 
+#define ENGINE_VERSION (3)
+
 #define TOTAL_MEM_SIZE (65536)
 #define SHARED_MEM_SIZE (8192)
 #define SHARED_MEM_LOCATION (0xE000)

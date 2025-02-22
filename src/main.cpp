@@ -50,6 +50,8 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
     long limit = 0;
     std::unique_ptr<World> world = std::make_unique<World>(seed);
 
+    std::cout << "Engine v" << ENGINE_VERSION << std::endl;
+
     std::string title = "King-Of-The-Grid | " + program1.get_name() + "(" + BOT_1 + ") vs " +
         program2.get_name() + "(" + BOT_2 + ") seed " + std::to_string(seed);
 
@@ -200,6 +202,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE
 int test_programs(char* program1_name, char* program2_name, int seed)
 {
     std::cout << "Hello " << program1_name << " " << program2_name << " " << seed << std::endl;
+    std::cout << "Engine v" << ENGINE_VERSION << std::endl;
 
     std::unique_ptr<CPUProgram> first_program = std::make_unique<CPUProgram>(program1_name, program1_name, true);
     std::unique_ptr<CPUProgram> second_program = std::make_unique<CPUProgram>(program2_name, program2_name, false);

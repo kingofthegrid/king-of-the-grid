@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <memory>
+#include <utility>
+#include <vector>
 
 World::World(int seed) :
     m_cells({}),
@@ -13,9 +15,12 @@ World::World(int seed) :
     m_cycle(0),
     m_seed(seed),
     m_random_engine(seed),
-    m_seasons(*this, seed)
+    m_seasons(*this, 0),
+    m_walls(*this, 0)
 {
     m_cells.resize(WorldRules::world_width * WorldRules::world_height);
+
+    m_seasons.generate(seed, 20.f);
 
     std::cout << "World Seed: " << seed << std::endl;
 }
@@ -150,4 +155,89 @@ void World::start()
     {
         m_recording->start();
     }
+
+    int walls_seed = m_seed + 1;
+
+    while (true)
+    {
+        m_walls.generate(walls_seed, 8.f);
+
+        std::vector<bool> wall_map = {};
+        wall_map.resize(WorldRules::world_height * WorldRules::world_width);
+
+        for (int i = 0; i < WorldRules::walls_count; i++)
+        {
+            int x, y;
+            m_walls.get_random_location(x, y);
+            wall_map[x + y * WorldRules::world_width] = true;
+        }
+
+        if (path_exists(0, 0, WorldRules::world_width - 1, WorldRules::world_height - 1,
+            WorldRules::world_height, WorldRules::world_width, [&wall_map](int x, int y) -> bool {
+                return wall_map[x + y * WorldRules::world_width];
+            }
+        )) {
+
+            for (int y = 0; y < WorldRules::world_height; y++)
+            {
+                for (int x = 0; x < WorldRules::world_width; x++)
+                {
+                    if (wall_map[x + y * WorldRules::world_width])
+                    {
+                        auto &cell = get_cell(x, y);
+                        if (cell.is_empty())
+                        {
+                            cell.set_wall();
+
+                            if (m_recording)
+                            {
+                                m_recording->new_cell(x, y, Recording::CELL_WALL, 1.0f);
+                            }
+                        }
+                    }
+                }
+            }
+
+            break;
+        }
+
+        walls_seed++;
+    }
+
+    std::cout << "Walls Seed: " << walls_seed << std::endl;
+}
+
+bool World::has_path(std::vector<std::vector<bool>> &visited,
+     int x, int y, int target_x, int target_y, int rows, int cols,
+     const std::function<bool(int x, int y)>& is_obstacle)
+{
+    if (x < 0 || y < 0 || x >= rows || y >= cols || visited[x][y] || is_obstacle(x, y))
+    {
+        return false;
+    }
+
+    if (x == target_x && y == target_y)
+    {
+        return true;
+    }
+
+    visited[x][y] = true;
+
+    // Explore all four directions (up, down, left, right)
+    if (has_path(visited, x + 1, y, target_x, target_y, rows, cols, is_obstacle) ||
+        has_path(visited, x - 1, y, target_x, target_y, rows, cols, is_obstacle) ||
+        has_path(visited, x, y + 1, target_x, target_y, rows, cols, is_obstacle) ||
+        has_path(visited, x, y - 1, target_x, target_y, rows, cols, is_obstacle))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool World::path_exists(int start_x, int start_y, int end_x, int end_y, int rows,
+                        int cols, const std::function<bool(int x, int y)>& is_obstacle)
+{
+    std::vector<std::vector<bool>> visited(rows, std::vector<bool>(cols, false));
+    return has_path(visited, start_x, start_y, end_x, end_y, rows, cols, is_obstacle);
 }

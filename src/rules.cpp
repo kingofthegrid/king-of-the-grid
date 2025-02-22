@@ -12,6 +12,10 @@ int WorldRules::world_height
 int WorldRules::world_iteration_limit
     = 100000;
 
+/* Amount of random walls */
+int WorldRules::walls_count
+    = 128;
+
 /* Maximum prey population */
 int WorldRules::prey_max_population
     = 10;

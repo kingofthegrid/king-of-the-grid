@@ -11,6 +11,11 @@ struct WorldRules
     /* Iteration limit (when reached, draw is declared) */
     static int world_iteration_limit;
 
+    /* =========================== WALLS ============================ */
+
+    /* Amount of random walls */
+    static int walls_count;
+
     /* ============================ PREY ============================ */
 
     /* Maximum prey population */

@@ -23,6 +23,8 @@
 #define SCAN_FOOD (2)
 // Scan cell: friendly bot (my copy)
 #define SCAN_FRIEND (3)
+// Scan cell: a wall
+#define SCAN_WALL (4)
 
 struct scan_t
 {

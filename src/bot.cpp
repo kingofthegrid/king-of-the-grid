@@ -127,6 +127,9 @@ void Bot::move(int x, int y)
     Bot* eating = nullptr;
     auto& new_cell = m_world.get_cell(new_x, new_y);
 
+    if (new_cell.is_wall())
+        return;
+
     if (new_cell.is_bot())
     {
         if (is_prey())

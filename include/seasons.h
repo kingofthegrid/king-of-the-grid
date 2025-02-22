@@ -8,7 +8,8 @@ class World;
 class Seasons
 {
 public:
-    explicit Seasons(World& world, int seed);
+    explicit Seasons(World& world, int padding);
+    void generate(int seed, float pow);
     void get_random_location(int& x, int &y);
 
 private:
@@ -18,5 +19,8 @@ private:
     std::vector<std::vector<float>> m_distribution;
     std::vector<int> m_flattened_distribution;
     std::mt19937 m_random_engine;
+    int m_padding;
+    int m_width;
+    int m_height;
     World& m_world;
 };

@@ -5,8 +5,8 @@ bots to compete on the most efficient algorithm to be King Of The Grid!
 
 <div align="center">
 
-https://github.com/user-attachments/assets/10258c56-2554-46ed-8e49-46176c138275
-  
+https://github.com/user-attachments/assets/2881a106-d6ee-4869-8e0b-37a01a3257bd
+
   Example of a single competition.
 </div>
 
@@ -17,8 +17,9 @@ https://github.com/user-attachments/assets/10258c56-2554-46ed-8e49-46176c138275
 * Two bots (or programs) spawn in top-left and bottom-right corners
 * Each bot has a set of energy. See [rules.cpp](src/rules.cpp) for exact values.
 * Bots run on Z80 CPU. See CPUs section.
+* Walls (obstacles) are generated before each game starts, such as it is guaranteed there is a path between two bots.
 * Food (static) and prey (moves) are spawned periodically.
-* Food is not spawned evenly: random noise is applied using [FastNoiseLite](https://github.com/Auburn/FastNoiseLite) on rules described on [seasons.cpp](src/seasons.cpp)
+* Food and Walls are not spawned evenly: random noise is applied using [FastNoiseLite](https://github.com/Auburn/FastNoiseLite) on rules described on [seasons.cpp](src/seasons.cpp)
 * Both can move around, eat, scan environment and clone themselves. See [bot_api.h](bot-api/bot_api.h)
 * Bot that survives the longest, wins.
 * If both bots survive for too long, it's a draw.

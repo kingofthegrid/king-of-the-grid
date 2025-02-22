@@ -190,6 +190,11 @@ void Recording::new_cell(int x, int y, int index, float intensity)
             RECORD(Position(xx, yy) << RichColor(5, 4, 0) << " ✿" << Progress(intensity));
             break;
         }
+        case CELL_WALL:
+        {
+            RECORD(Position(xx, yy) << RichColor(1, 1, 1) << "[" << RichColor(5, 0, 0) << "■" << RichColor(1, 1, 1) << "]");
+            break;
+        }
         case CELL_PREY:
         {
             RECORD(Position(xx, yy) << RichColor(0, 5, 0) << " ⏺" << Progress(intensity));

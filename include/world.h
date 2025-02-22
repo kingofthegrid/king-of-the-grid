@@ -4,6 +4,7 @@
 #include <random>
 #include <list>
 #include <memory>
+#include <functional>
 
 #include "bot.h"
 #include "defines.h"
@@ -15,7 +16,8 @@ enum class CellState
 {
     empty,
     food,
-    bot
+    bot,
+    wall
 };
 
 struct Cell
@@ -29,6 +31,7 @@ struct Cell
     bool is_empty() const { return state == CellState::empty; }
     bool is_bot() const { return state == CellState::bot; }
     bool is_food() const { return state == CellState::food; }
+    bool is_wall() const { return state == CellState::wall; }
 
     void set_empty() {
         state = CellState::empty; m_food_value = 0; m_bot_value.reset();
@@ -43,6 +46,11 @@ struct Cell
     {
         state = CellState::bot;
         m_bot_value = bot;
+    }
+
+    void set_wall()
+    {
+        state = CellState::wall;
     }
 };
 
@@ -77,11 +85,17 @@ public:
     std::unique_ptr<Recording>& get_recording() { return m_recording; }
     std::mt19937& get_random_engine() { return m_random_engine; }
     Seasons& get_seasons() { return m_seasons; }
+    Seasons& get_walls() { return m_walls; }
+
+private:
+    bool path_exists(int start_x, int start_y, int end_x, int end_y, int rows, int cols, const std::function<bool(int x, int y)>& is_obstacle);
+    bool has_path(std::vector<std::vector<bool>> &visited, int x, int y, int target_x, int target_y, int rows, int cols, const std::function<bool(int x, int y)>& is_obstacle);
 
 private:
     std::vector<Cell> m_cells;
     std::list<std::shared_ptr<Bot>> m_bots;
     Seasons m_seasons;
+    Seasons m_walls;
 
     bool m_running;
     int m_cycle;

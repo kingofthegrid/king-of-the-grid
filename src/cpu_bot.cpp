@@ -468,8 +468,36 @@ int CPUBot::split(int x, int y, int energy)
         if (new_x >= WorldRules::world_width || new_y >= WorldRules::world_height)
             return 0;
 
+        auto& clone_cell = m_world.get_cell(new_x, new_y);
+        if (clone_cell.is_wall())
+            return 0;
+
         m_energy -= energy;
-        auto new_bot = std::make_shared<CPUBot>(m_frontend, m_program, m_world, new_x, new_y, energy);
+        int new_bot_energy = energy;
+
+        if (clone_cell.is_food())
+        {
+            new_bot_energy += clone_cell.m_food_value * WorldRules::food_energy_multiplier;
+        }
+        else if (clone_cell.is_bot())
+        {
+            auto bot = clone_cell.m_bot_value.lock();
+
+            if (bot)
+            {
+                if (bot->is_enemy(this))
+                {
+                    new_bot_energy += bot->get_energy();
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        auto new_bot = std::make_shared<CPUBot>(
+            m_frontend, m_program, m_world, new_x, new_y, new_bot_energy);
         new_bot->m_source_x = get_x();
         new_bot->m_source_y = get_y();
         m_world.add_bot(m_frontend, new_bot);

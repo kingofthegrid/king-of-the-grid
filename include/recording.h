@@ -92,6 +92,7 @@ public:
     static constexpr int CELL_BOT_B = 2;
     static constexpr int CELL_FOOD = 3;
     static constexpr int CELL_PREY = 4;
+    static constexpr int CELL_WALL = 5;
 
 public:
     Recording(World& world, const std::string& name, const std::string& title);

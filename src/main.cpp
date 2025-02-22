@@ -88,7 +88,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
 
     if (world->get_recording())
     {
-        world->get_recording()->event("Playing: " + program1.get_name() + "() vs " + program2.get_name() + "()");
+        world->get_recording()->event("Playing: " + program1.get_name() + "(" + BOT_1 + ") vs " + program2.get_name() + "(" + BOT_2 + ")");
     }
 
     while (world->is_running())
@@ -111,6 +111,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
             }
             result = 2;
             world->stop();
+            break;
         }
         else if (program2.lost())
         {
@@ -120,6 +121,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
             }
             result = 1;
             world->stop();
+            break;
         }
 
         limit++;
@@ -236,7 +238,7 @@ int main(int argc, char** argv)
             throw std::runtime_error("Server runtime needs at least two runtimes.");
         }
 
-        unsigned long master_seed_v;
+        unsigned int master_seed_v;
 
         if (getenv("MASS_SEED"))
         {
@@ -247,11 +249,22 @@ int main(int argc, char** argv)
             master_seed_v = time(0);
         }
 
+
+        std::cout << "c++ version: " << __cplusplus << std::endl;
+
+#if defined(_GLIBCXX_RELEASE)
+        std::cout << "libstdc++ version: " << _GLIBCXX_RELEASE << std::endl;
+#elif defined(_LIBCPP_VERSION)
+        std::cout << "libc++ version: " << _LIBCPP_VERSION << std::endl;
+#elif defined(_MSC_VER)
+        std::cout << "MSVC version: " << _MSC_VER << std::endl;
+#endif
+
         std::cout << "Using master (mass) seed: " << master_seed_v << " define MASS_SEED to overwrite" << std::endl;
         std::mt19937 master_seed(master_seed_v);
 
         std::function<int(int max)> get_master_random = [&](int max){
-            std::uniform_int_distribution<int> distribution(0, max - 1);
+            std::uniform_int_distribution<int> distribution(0, max);
             return distribution(master_seed);
         };
 

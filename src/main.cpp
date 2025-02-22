@@ -38,7 +38,8 @@ std::vector<std::string> find_bin_files(const std::string& folder_path)
     return result;
 }
 
-int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool simple_name)
+int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
+                  CPUProgram& program2, std::string program2_icon, bool simple_name)
 {
     if (seed > 65535 || seed < 0)
     {
@@ -52,8 +53,8 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
 
     std::cout << "Engine v" << ENGINE_VERSION << std::endl;
 
-    std::string title = "King-Of-The-Grid | " + program1.get_name() + "(" + BOT_1 + ") vs " +
-        program2.get_name() + "(" + BOT_2 + ") seed " + std::to_string(seed);
+    std::string title = "King-Of-The-Grid | " + program1.get_name() + "(" + program1_icon + ") vs " +
+        program2.get_name() + "(" + program2_icon + ") seed " + std::to_string(seed);
 
     if (simple_name)
     {
@@ -88,7 +89,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
 
     if (world->get_recording())
     {
-        world->get_recording()->event("Playing: " + program1.get_name() + "(" + BOT_1 + ") vs " + program2.get_name() + "(" + BOT_2 + ")");
+        world->get_recording()->event("Playing: " + program1.get_name() + "(" + program1_icon + ") vs " + program2.get_name() + "(" + program2_icon + ")");
     }
 
     while (world->is_running())
@@ -107,7 +108,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
         {
             if (world->get_recording())
             {
-                world->get_recording()->event(">>>>>>>>>>>> Program " + program2.get_name() + " " + BOT_2 + " won.");
+                world->get_recording()->event(">>>>>>>>>>>> Program " + program2.get_name() + " " + program2_icon + " won.");
             }
             result = 2;
             world->stop();
@@ -117,7 +118,7 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
         {
             if (world->get_recording())
             {
-                world->get_recording()->event(">>>>>>>>>>>> Program " + program1.get_name() + " " + BOT_1 + " won.");
+                world->get_recording()->event(">>>>>>>>>>>> Program " + program1.get_name() + " " + program1_icon + " won.");
             }
             result = 1;
             world->stop();
@@ -154,12 +155,12 @@ int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool sim
     {
         case 1:
         {
-            std::cout << "    Program " << program1.get_name() << " " << BOT_1 << " won." << std::endl;
+            std::cout << "    Program " << program1.get_name() << " " << program1_icon << " won." << std::endl;
             break;
         }
         case 2:
         {
-            std::cout << "    Program " << program2.get_name() << " " << BOT_2 << " won." << std::endl;
+            std::cout << "    Program " << program2.get_name() << " " << program2_icon << " won." << std::endl;
             break;
         }
         case 0:
@@ -209,7 +210,7 @@ int test_programs(char* program1_name, char* program2_name, int seed)
     std::unique_ptr<CPUProgram> first_program = std::make_unique<CPUProgram>(program1_name, program1_name, true);
     std::unique_ptr<CPUProgram> second_program = std::make_unique<CPUProgram>(program2_name, program2_name, false);
 
-    int result = test_programs(seed, *first_program, *second_program, true);
+    int result = test_programs(seed, *first_program, BOT_1, *second_program, BOT_2, true);
     return result;
 }
 #else
@@ -284,7 +285,7 @@ int main(int argc, char** argv)
                     std::cout << "-------------------" << std::endl;
 
                     {
-                        int result1 = test_programs(seed, it1->second, it2->second, false);
+                        int result1 = test_programs(seed, it1->second, BOT_1, it2->second, BOT_2, false);
 
                         std::cout << "-------------------" << std::endl;
                         switch (result1)
@@ -316,7 +317,7 @@ int main(int argc, char** argv)
 
                     // swap places
                     {
-                        int result2 = test_programs(seed, it2->second, it1->second, false);
+                        int result2 = test_programs(seed, it2->second, BOT_2, it1->second, BOT_1, false);
 
                         switch (result2)
                         {
@@ -450,7 +451,7 @@ int main(int argc, char** argv)
         CPUProgram first_program(program1_name, program1_name + ".bin", true);
         CPUProgram second_program(program2_name, program2_name + ".bin", false);
 
-        int result = test_programs(seed, first_program, second_program, false);
+        int result = test_programs(seed, first_program, BOT_1, second_program, BOT_2, false);
         return result;
     }
 }

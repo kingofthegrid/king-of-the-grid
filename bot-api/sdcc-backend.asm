@@ -49,21 +49,25 @@
 _bot_move_up:
     ld a, #100
     .db 0xED, 0xFE
+    ld a, l
     ret
 
 _bot_move_down:
     ld a, #101
     .db 0xED, 0xFE
+    ld a, l
     ret
 
 _bot_move_left:
     ld a, #102
     .db 0xED, 0xFE
+    ld a, l
     ret
 
 _bot_move_right:
     ld a, #103
     .db 0xED, 0xFE
+    ld a, l
     ret
 
 _bot_get_x:

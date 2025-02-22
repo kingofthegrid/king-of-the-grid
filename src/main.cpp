@@ -270,6 +270,7 @@ int main(int argc, char** argv)
         };
 
         std::map<std::string, std::vector<std::string>> wins {};
+        std::map<std::string, std::vector<std::string>> draws {};
 
         // Nested loop to test each program against all subsequent programs
         for (auto it1 = programs.begin(); it1 != programs.end(); ++it1)
@@ -286,6 +287,7 @@ int main(int argc, char** argv)
 
                     {
                         int result1 = test_programs(seed, it1->second, BOT_1, it2->second, BOT_2, false);
+                        std::string recording_name = "recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt";
 
                         std::cout << "-------------------" << std::endl;
                         switch (result1)
@@ -293,20 +295,22 @@ int main(int argc, char** argv)
                             case 1:
                             {
                                 it1->second.bump_score();
-                                wins[it1->first].push_back("recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt");
+                                wins[it1->first].push_back(recording_name);
                                 std::cout << "A: Program " << it1->first << " " << BOT_1 << " won." << std::endl;
                                 break;
                             }
                             case 2:
                             {
                                 it2->second.bump_score();
-                                wins[it2->first].push_back("recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt");
+                                wins[it2->first].push_back(recording_name);
                                 std::cout << "A: Program " << it2->first << " " << BOT_2 << " won." << std::endl;
                                 break;
                             }
                             case 0:
                             default:
                             {
+                                draws[it1->first].push_back(recording_name);
+                                draws[it2->first].push_back(recording_name);
                                 std::cout << "A: Draw." << std::endl;
                                 break;
                             }
@@ -318,26 +322,29 @@ int main(int argc, char** argv)
                     // swap places
                     {
                         int result2 = test_programs(seed, it2->second, BOT_2, it1->second, BOT_1, false);
+                        std::string recording_name = "recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt";
 
                         switch (result2)
                         {
                             case 1:
                             {
                                 it2->second.bump_score();
-                                wins[it2->first].push_back("recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt");
+                                wins[it2->first].push_back(recording_name);
                                 std::cout << "B: Program " << it2->first << " " << BOT_2 << " won." << std::endl;
                                 break;
                             }
                             case 2:
                             {
                                 it1->second.bump_score();
-                                wins[it1->first].push_back("recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt");
+                                wins[it1->first].push_back(recording_name);
                                 std::cout << "B: Program " << it1->first << " " << BOT_1 << " won." << std::endl;
                                 break;
                             }
                             case 0:
                             default:
                             {
+                                draws[it1->first].push_back(recording_name);
+                                draws[it2->first].push_back(recording_name);
                                 std::cout << "B: Draw." << std::endl;
                                 break;
                             }
@@ -387,17 +394,38 @@ int main(int argc, char** argv)
                 outcome << "    \"score\": " << p->get_score() << "," << std::endl;
                 outcome << "    \"wins\": [";
 
-                bool first = true;
-                for (const auto& win: wins[p->get_name()])
                 {
-                    if (first)
+                    bool first = true;
+                    for (const auto& win: wins[p->get_name()])
                     {
-                        first = false;
-                        outcome << "\"" << win << "\"";
+                        if (first)
+                        {
+                            first = false;
+                            outcome << "\"" << win << "\"";
+                        }
+                        else
+                        {
+                            outcome << ", \"" << win << "\"";
+                        }
                     }
-                    else
+                }
+
+                outcome << "], " << std::endl;
+                outcome << "    \"draws\": [";
+
+                {
+                    bool first = true;
+                    for (const auto& draw: draws[p->get_name()])
                     {
-                        outcome << ", \"" << win << "\"";
+                        if (first)
+                        {
+                            first = false;
+                            outcome << "\"" << draw << "\"";
+                        }
+                        else
+                        {
+                            outcome << ", \"" << draw << "\"";
+                        }
                     }
                 }
 

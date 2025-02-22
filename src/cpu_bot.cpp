@@ -122,29 +122,65 @@ static zuint8 z80_illegal_instruction(Z80 *cpu, zuint8 opcode)
                 case CMD_MOVE_UP:
                 {
                     auto* computer = (CPUBot*)cpu->context;
-                    computer->move_up();
-                    z80_break(cpu);
+                    if (computer->move_up())
+                    {
+                        Z80_HL(*cpu) = 1;
+                        Z80_DE(*cpu) = 1;
+                        z80_break(cpu);
+                    }
+                    else
+                    {
+                        Z80_HL(*cpu) = 0;
+                        Z80_DE(*cpu) = 0;
+                    }
                     break;
                 }
                 case CMD_MOVE_DOWN:
                 {
                     auto* computer = (CPUBot*)cpu->context;
-                    computer->move_down();
-                    z80_break(cpu);
+                    if (computer->move_down())
+                    {
+                        Z80_HL(*cpu) = 1;
+                        Z80_DE(*cpu) = 1;
+                        z80_break(cpu);
+                    }
+                    else
+                    {
+                        Z80_HL(*cpu) = 0;
+                        Z80_DE(*cpu) = 0;
+                    }
                     break;
                 }
                 case CMD_MOVE_LEFT:
                 {
                     auto* computer = (CPUBot*)cpu->context;
-                    computer->move_left();
-                    z80_break(cpu);
+                    if (computer->move_left())
+                    {
+                        Z80_HL(*cpu) = 1;
+                        Z80_DE(*cpu) = 1;
+                        z80_break(cpu);
+                    }
+                    else
+                    {
+                        Z80_HL(*cpu) = 0;
+                        Z80_DE(*cpu) = 0;
+                    }
                     break;
                 }
                 case CMD_MOVE_RIGHT:
                 {
                     auto* computer = (CPUBot*)cpu->context;
-                    computer->move_right();
-                    z80_break(cpu);
+                    if (computer->move_right())
+                    {
+                        Z80_HL(*cpu) = 1;
+                        Z80_DE(*cpu) = 1;
+                        z80_break(cpu);
+                    }
+                    else
+                    {
+                        Z80_HL(*cpu) = 0;
+                        Z80_DE(*cpu) = 0;
+                    }
                     break;
                 }
                 case CMD_SCAN:

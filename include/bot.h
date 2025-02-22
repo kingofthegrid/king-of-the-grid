@@ -44,10 +44,10 @@ public:
     int get_y() const { return m_y; }
     int get_id() const { return m_id; }
 
-    void move_left();
-    void move_right();
-    void move_up();
-    void move_down();
+    bool move_left();
+    bool move_right();
+    bool move_up();
+    bool move_down();
 
     virtual bool is_prey() const { return true; }
     virtual bool is_cpu() const { return false; }
@@ -56,7 +56,7 @@ public:
 protected:
     Frontend& m_frontend;
     World& m_world;
-    void move(int x, int y);
+    bool move(int x, int y);
     int m_energy;
     int m_energy_timer;
     int m_move_timer;

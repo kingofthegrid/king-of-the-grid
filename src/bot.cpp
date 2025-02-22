@@ -90,52 +90,52 @@ void Bot::simulate()
     }
 }
 
-void Bot::move_left()
+bool Bot::move_left()
 {
-    move(-1, 0);
+    return move(-1, 0);
 }
 
-void Bot::move_right()
+bool Bot::move_right()
 {
-    move(1, 0);
+    return move(1, 0);
 }
 
-void Bot::move_up()
+bool Bot::move_up()
 {
-    move(0, -1);
+    return move(0, -1);
 }
 
-void Bot::move_down()
+bool Bot::move_down()
 {
-    move(0, 1);
+    return move(0, 1);
 }
 
-void Bot::move(int x, int y)
+bool Bot::move(int x, int y)
 {
     if (m_bot_state != BotState::normal)
-        return;
+        return false;
 
     int new_x = m_x + x;
     int new_y = m_y + y;
 
     if (new_x < 0 || new_y < 0)
-        return;
+        return false;
 
     if (new_x >= WorldRules::world_width || new_y >= WorldRules::world_height)
-        return;
+        return false;
 
     Bot* eating = nullptr;
     auto& new_cell = m_world.get_cell(new_x, new_y);
 
     if (new_cell.is_wall())
-        return;
+        return false;
 
     if (new_cell.is_bot())
     {
         if (is_prey())
         {
             // prey can't eat other bots
-            return;
+            return false;
         }
 
         auto bot = new_cell.m_bot_value.lock();
@@ -148,7 +148,8 @@ void Bot::move(int x, int y)
             }
             else
             {
-                return;
+                // can't eat friendlies
+                return false;
             }
         }
     }
@@ -219,4 +220,6 @@ void Bot::move(int x, int y)
     m_energy -= WorldRules::energy_to_move;
     m_move_timer = 0;
     m_bot_state = BotState::moving;
+
+    return true;
 }

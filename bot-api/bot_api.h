@@ -48,23 +48,27 @@ extern unsigned int bot_get_seed(void) CALLAPI;
 
 /* Move bot up.
  * Blocks the execution until the bot has completed the movement.
- * Takes some energy. */
-extern void bot_move_up(void) CALLAPI;
+ * Returns 1 on success and 0 if the movement was blocked.
+ * Takes some energy if successful. */
+extern unsigned char bot_move_up(void) CALLAPI;
 
 /* Move bot down.
  * Blocks the execution until the bot has completed the movement.
- * Takes some energy. */
-extern void bot_move_down(void) CALLAPI;
+ * Returns 1 on success and 0 if the movement was blocked.
+ * Takes some energy if successful. */
+extern unsigned char bot_move_down(void) CALLAPI;
 
 /* Move bot left.
  * Blocks the execution until the bot has completed the movement.
- * Takes some energy. */
-extern void bot_move_left(void) CALLAPI;
+ * Returns 1 on success and 0 if the movement was blocked.
+ * Takes some energy if successful. */
+extern unsigned char bot_move_left(void) CALLAPI;
 
 /* Move bot right.
  * Blocks the execution until the bot has completed the movement.
- * Takes some energy. */
-extern void bot_move_right(void) CALLAPI;
+ * Returns 1 on success and 0 if the movement was blocked.
+ * Takes some energy if successful. */
+extern unsigned char bot_move_right(void) CALLAPI;
 
 /* Make a clone of myself in the cell up.
  * Blocks until cloning is complete.

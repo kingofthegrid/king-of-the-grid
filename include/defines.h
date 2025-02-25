@@ -10,3 +10,4 @@
 #define SCAN_ENEMY (1)
 #define SCAN_FOOD (2)
 #define SCAN_FRIEND (3)
+#define SCAN_WALL (4)

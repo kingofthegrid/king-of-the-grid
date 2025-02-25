@@ -471,6 +471,10 @@ void CPUBot::scan(struct scan_t* scan)
                     result = SCAN_NOTHING;
                 }
             }
+            else if (cell.is_wall())
+            {
+                result = SCAN_WALL;
+            }
             else
             {
                 result = SCAN_NOTHING;

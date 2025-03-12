@@ -38,8 +38,7 @@ std::vector<std::string> find_bin_files(const std::string& folder_path)
     return result;
 }
 
-int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
-                  CPUProgram& program2, std::string program2_icon, bool simple_name)
+int test_programs(int seed, CPUProgram& program1, CPUProgram& program2, bool simple_name)
 {
     if (seed > 65535 || seed < 0)
     {
@@ -53,8 +52,8 @@ int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
 
     std::cout << "Engine v" << ENGINE_VERSION << std::endl;
 
-    std::string title = "King-Of-The-Grid | " + program1.get_name() + "(" + program1_icon + ") vs " +
-        program2.get_name() + "(" + program2_icon + ") seed " + std::to_string(seed);
+    std::string title = "King-Of-The-Grid | " + program1.get_name() + "(" + BOT_1 + ") vs " +
+        program2.get_name() + "(" + BOT_2 + ") seed " + std::to_string(seed);
 
     if (simple_name)
     {
@@ -75,13 +74,13 @@ int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
     world->add_bot(*frontend, std::make_shared<CPUBot>(
         *frontend, program1, *world,
         0, 0,
-        WorldRules::bot_energy_spawn));
+        WorldRules::bot_energy_spawn, true));
 
     world->add_bot(*frontend, std::make_shared<CPUBot>(
         *frontend, program2, *world,
         WorldRules::world_width - 1,
         WorldRules::world_height - 1,
-        WorldRules::bot_energy_spawn));
+        WorldRules::bot_energy_spawn, false));
 
     world->start();
 
@@ -89,7 +88,7 @@ int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
 
     if (world->get_recording())
     {
-        world->get_recording()->event("Playing: " + program1.get_name() + "(" + program1_icon + ") vs " + program2.get_name() + "(" + program2_icon + ")");
+        world->get_recording()->event("Playing: " + program1.get_name() + "(" + BOT_1 + ") vs " + program2.get_name() + "(" + BOT_2 + ")");
     }
 
     while (world->is_running())
@@ -108,7 +107,7 @@ int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
         {
             if (world->get_recording())
             {
-                world->get_recording()->event(">>>>>>>>>>>> Program " + program2.get_name() + " " + program2_icon + " won.");
+                world->get_recording()->event(">>>>>>>>>>>> Program " + program2.get_name() + " " + BOT_2 + " won.");
             }
             result = 2;
             world->stop();
@@ -118,7 +117,7 @@ int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
         {
             if (world->get_recording())
             {
-                world->get_recording()->event(">>>>>>>>>>>> Program " + program1.get_name() + " " + program1_icon + " won.");
+                world->get_recording()->event(">>>>>>>>>>>> Program " + program1.get_name() + " " + BOT_1 + " won.");
             }
             result = 1;
             world->stop();
@@ -155,12 +154,12 @@ int test_programs(int seed, CPUProgram& program1, std::string program1_icon,
     {
         case 1:
         {
-            std::cout << "    Program " << program1.get_name() << " " << program1_icon << " won." << std::endl;
+            std::cout << "    Program " << program1.get_name() << " " << BOT_1 << " won." << std::endl;
             break;
         }
         case 2:
         {
-            std::cout << "    Program " << program2.get_name() << " " << program2_icon << " won." << std::endl;
+            std::cout << "    Program " << program2.get_name() << " " << BOT_2 << " won." << std::endl;
             break;
         }
         case 0:
@@ -207,10 +206,10 @@ int test_programs(char* program1_name, char* program2_name, int seed)
     std::cout << "Hello " << program1_name << " " << program2_name << " " << seed << std::endl;
     std::cout << "Engine v" << ENGINE_VERSION << std::endl;
 
-    std::unique_ptr<CPUProgram> first_program = std::make_unique<CPUProgram>(program1_name, program1_name, true);
-    std::unique_ptr<CPUProgram> second_program = std::make_unique<CPUProgram>(program2_name, program2_name, false);
+    std::unique_ptr<CPUProgram> first_program = std::make_unique<CPUProgram>(program1_name, program1_name);
+    std::unique_ptr<CPUProgram> second_program = std::make_unique<CPUProgram>(program2_name, program2_name);
 
-    int result = test_programs(seed, *first_program, BOT_1, *second_program, BOT_2, true);
+    int result = test_programs(seed, *first_program, *second_program, true);
     return result;
 }
 #else
@@ -226,7 +225,7 @@ int main(int argc, char** argv)
         {
             programs.emplace(std::piecewise_construct,
                 std::forward_as_tuple(program),
-                std::forward_as_tuple(program, program + ".bin", programs.empty()));
+                std::forward_as_tuple(program, program + ".bin"));
         }
 
         if (programs.empty())
@@ -286,7 +285,7 @@ int main(int argc, char** argv)
                     std::cout << "-------------------" << std::endl;
 
                     {
-                        int result1 = test_programs(seed, it1->second, BOT_1, it2->second, BOT_2, false);
+                        int result1 = test_programs(seed, it1->second, it2->second, false);
                         std::string recording_name = "recording-" + it1->first + "-" + it2->first + "-" + std::to_string(seed) + ".txt";
 
                         std::cout << "-------------------" << std::endl;
@@ -321,7 +320,7 @@ int main(int argc, char** argv)
 
                     // swap places
                     {
-                        int result2 = test_programs(seed, it2->second, BOT_2, it1->second, BOT_1, false);
+                        int result2 = test_programs(seed, it2->second, it1->second, false);
                         std::string recording_name = "recording-" + it2->first + "-" + it1->first + "-" + std::to_string(seed) + ".txt";
 
                         switch (result2)
@@ -476,10 +475,10 @@ int main(int argc, char** argv)
             std::cout << "Seed not provided. Using random: " << seed << std::endl;
         }
 
-        CPUProgram first_program(program1_name, program1_name + ".bin", true);
-        CPUProgram second_program(program2_name, program2_name + ".bin", false);
+        CPUProgram first_program(program1_name, program1_name + ".bin");
+        CPUProgram second_program(program2_name, program2_name + ".bin");
 
-        int result = test_programs(seed, first_program, BOT_1, second_program, BOT_2, false);
+        int result = test_programs(seed, first_program, second_program, false);
         return result;
     }
 }

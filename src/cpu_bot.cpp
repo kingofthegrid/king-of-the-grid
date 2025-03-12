@@ -295,11 +295,10 @@ static void z80_retn(void *context)
 {
 }
 
-CPUProgram::CPUProgram(const std::string& name, const std::string& filename, bool first) :
+CPUProgram::CPUProgram(const std::string& name, const std::string& filename) :
     m_name(name),
     m_program {},
     m_shared_ram {},
-    m_first(first),
     m_score(0)
 {
     std::cout << "Reading program " << name << " ..." << std::endl;
@@ -329,7 +328,7 @@ CPUProgram::CPUProgram(const std::string& name, const std::string& filename, boo
     file.close();
 }
 
-CPUBot::CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int y, int energy) :
+CPUBot::CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int y, int energy, bool bot_1) :
     Bot(frontend, "CPU " + program.get_name(), world, x, y, energy),
     m_program(program),
     m_cpu {},
@@ -337,7 +336,8 @@ CPUBot::CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int
     m_stdout(),
     m_stdout_total(),
     m_seed(world.get_seed()),
-    m_shared_memory_enabled(false)
+    m_shared_memory_enabled(false),
+    m_bot_1(bot_1)
 {
     m_program.add_count();
 
@@ -374,7 +374,7 @@ CPUBot::~CPUBot()
             if (m_world.get_recording())
             {
                 replace_all(out, "\n", "\\n");
-                m_world.get_recording()->add_stdout(m_program.is_first() ? 0 : 1, out);
+                m_world.get_recording()->add_stdout(m_bot_1 ? 0 : 1, out);
             }
         }
     }
@@ -537,7 +537,7 @@ int CPUBot::split(int x, int y, int energy)
         }
 
         auto new_bot = std::make_shared<CPUBot>(
-            m_frontend, m_program, m_world, new_x, new_y, new_bot_energy);
+            m_frontend, m_program, m_world, new_x, new_y, new_bot_energy, m_bot_1);
         new_bot->m_source_x = get_x();
         new_bot->m_source_y = get_y();
         m_world.add_bot(m_frontend, new_bot);
@@ -568,7 +568,7 @@ void CPUBot::on_stdout(char c)
         std::string o = m_stdout.str();
         replace_all(o, "\n", "\\n");
         replace_all(o, "\r", "");
-        m_world.get_recording()->add_stdout(m_program.is_first() ? 0 : 1, o);
+        m_world.get_recording()->add_stdout(m_bot_1 ? 0 : 1, o);
 
         m_stdout.str("");
     }
@@ -584,5 +584,5 @@ void CPUBot::on_stdout(char c)
 
 int CPUBot::get_bot_type() const
 {
-    return m_program.is_first() ? Recording::CELL_BOT_A : Recording::CELL_BOT_B;
+    return m_bot_1 ? Recording::CELL_BOT_1 : Recording::CELL_BOT_2;
 }

@@ -200,13 +200,13 @@ void Recording::new_cell(int x, int y, int index, float intensity)
             RECORD(Position(xx, yy) << RichColor(0, 5, 0) << " ⏺" << Progress(intensity));
             break;
         }
-        case CELL_BOT_A:
+        case CELL_BOT_1:
         {
             RECORD(Position(xx, yy) << RichColor(5, 2, 0) << " " << BOT_1 << Progress(intensity));
 
             break;
         }
-        case CELL_BOT_B:
+        case CELL_BOT_2:
         default:
         {
             RECORD(Position(xx, yy) << RichColor(0, 2, 5) << " " << BOT_2 << Progress(intensity));

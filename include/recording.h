@@ -88,8 +88,8 @@ public:
 class Recording
 {
 public:
-    static constexpr int CELL_BOT_A = 1;
-    static constexpr int CELL_BOT_B = 2;
+    static constexpr int CELL_BOT_1 = 1;
+    static constexpr int CELL_BOT_2 = 2;
     static constexpr int CELL_FOOD = 3;
     static constexpr int CELL_PREY = 4;
     static constexpr int CELL_WALL = 5;

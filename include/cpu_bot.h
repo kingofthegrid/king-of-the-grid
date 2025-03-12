@@ -13,7 +13,7 @@ class Frontend;
 class CPUProgram
 {
 public:
-    explicit CPUProgram(const std::string& name, const std::string& filename, bool first);
+    explicit CPUProgram(const std::string& name, const std::string& filename);
 
     const uint8_t* get_program_memory() const { return m_program; }
     uint8_t* get_shared_memory() { return m_shared_ram; }
@@ -22,7 +22,6 @@ public:
     void add_count() { m_count++; }
     void remove_count() { m_count--; }
     bool lost() { return m_count <= 0; }
-    bool is_first() const { return m_first; }
 
     int get_score() const { return m_score; }
     void bump_score() { m_score++; }
@@ -32,7 +31,6 @@ private:
     uint8_t m_program[TOTAL_MEM_SIZE];
     uint8_t m_shared_ram[SHARED_MEM_SIZE];
     int m_count;
-    bool m_first;
     int m_score;
 };
 
@@ -44,7 +42,7 @@ struct scan_t
 class CPUBot: public Bot
 {
 public:
-    explicit CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int y, int energy);
+    explicit CPUBot(Frontend& frontend, CPUProgram& program, World& world, int x, int y, int energy, bool bot_1);
     ~CPUBot() override;
 
     void simulate() override;
@@ -76,4 +74,5 @@ private:
     std::stringstream m_stdout_total;
     bool m_shared_memory_enabled;
     int m_seed;
+    bool m_bot_1;
 };
